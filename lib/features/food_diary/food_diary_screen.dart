@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -37,6 +38,10 @@ class _FoodDiaryScreenState extends ConsumerState<FoodDiaryScreen> {
             },
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddMealSheet(context, today),
+        child: const Icon(Icons.add),
       ),
       body: Column(
         children: [
@@ -128,8 +133,106 @@ class _FoodDiaryScreenState extends ConsumerState<FoodDiaryScreen> {
     );
   }
 
+  void _showAddMealSheet(BuildContext context, DateTime date) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Add Meal', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: const Icon(Icons.search),
+                  title: const Text('Search food database'),
+                  subtitle: const Text('Browse all ingredients'),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _pickFood(context, date);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.restaurant_menu),
+                  title: const Text('Pick from recipes'),
+                  subtitle: const Text('Coming soon'),
+                  enabled: false,
+                  onTap: () {},
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickFood(BuildContext context, DateTime date) async {
+    // Navigate to food database picker
+    final db = ref.read(databaseProvider);
+    final ingredients = await db.select(db.ingredients).get();
+    if (!context.mounted) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => _FoodPickerScreen(
+          ingredients: ingredients,
+          onSelected: (ingredient) async {
+            // Insert into food log
+            await db.into(db.foodLogs).insert(
+              FoodLogsCompanion(
+                id: drift.Value(DateTime.now().microsecondsSinceEpoch.toString()),
+                date: drift.Value(date),
+                mealType: const drift.Value('snack_1'),
+                ingredientId: drift.Value(ingredient.id),
+                amountGrams: const drift.Value(100),
+                createdAt: drift.Value(DateTime.now()),
+              ),
+            );
+            ref.invalidate(_todayEntriesProvider(_selectedDate));
+            ref.invalidate(_dailySummaryProvider(_selectedDate));
+          },
+        ),
+      ),
+    );
+  }
+
   String _formatDate(DateTime d) {
     return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+  }
+}
+
+/// Simple food picker that shows all ingredients and lets the user tap one.
+class _FoodPickerScreen extends StatelessWidget {
+  final List<Ingredient> ingredients;
+  final void Function(Ingredient) onSelected;
+
+  const _FoodPickerScreen({required this.ingredients, required this.onSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Pick Food')),
+      body: ListView.builder(
+        itemCount: ingredients.length,
+        itemBuilder: (context, index) {
+          final ing = ingredients[index];
+          return ListTile(
+            leading: const Icon(Icons.food_bank),
+            title: Text(ing.name),
+            subtitle: Text(ing.category ?? ''),
+            onTap: () {
+              onSelected(ing);
+              Navigator.pop(context);
+              Navigator.pop(context); // also close the bottom sheet
+            },
+          );
+        },
+      ),
+    );
   }
 }
 
