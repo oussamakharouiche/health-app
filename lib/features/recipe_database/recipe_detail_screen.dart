@@ -3,18 +3,44 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/database/database.dart';
 import '../../core/services/database_provider.dart';
+import 'recipe_edit_screen.dart';
 
 /// Full detail view for a recipe: ingredients, nutrition, instructions, tags.
-class RecipeDetailScreen extends ConsumerWidget {
+/// Supports serving scaling via a slider.
+class RecipeDetailScreen extends ConsumerStatefulWidget {
   final String recipeId;
   const RecipeDetailScreen({super.key, required this.recipeId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final detailAsync = ref.watch(_recipeDetailProvider(recipeId));
+  ConsumerState<RecipeDetailScreen> createState() => _RecipeDetailScreenState();
+}
+
+class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
+  double _scale = 1.0; // multiplier relative to default servings
+
+  @override
+  Widget build(BuildContext context) {
+    final detailAsync = ref.watch(_recipeDetailProvider(widget.recipeId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Recipe Detail')),
+      appBar: AppBar(
+        title: const Text('Recipe Detail'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            tooltip: 'Edit recipe',
+            onPressed: () {
+              // Navigate to edit screen with existing recipe
+              final data = ref.read(_recipeDetailProvider(widget.recipeId)).valueOrNull;
+              if (data != null) {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => RecipeEditScreen(existing: data.recipe),
+                )).then((_) => ref.invalidate(_recipeDetailProvider(widget.recipeId)));
+              }
+            },
+          ),
+        ],
+      ),
       body: detailAsync.when(
         data: (data) => data != null ? _buildContent(context, data) : const Center(child: Text('Not found')),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -59,26 +85,48 @@ class RecipeDetailScreen extends ConsumerWidget {
         ],
         const SizedBox(height: 16),
 
-        // Stats row
+        // Stats row with scaling
         Row(
           children: [
             _statCard(context, '$totalTime', 'min', Icons.timer),
             const SizedBox(width: 8),
-            _statCard(context, '${servings?.round() ?? 1}', 'servings', Icons.people),
+            _statCard(context, '${(_scale * (servings ?? 1)).round()}', 'servings', Icons.people),
             const SizedBox(width: 8),
-            _statCard(context, '${kcal.round()}', 'kcal', Icons.local_fire_department),
+            _statCard(context, '${(kcal * _scale).round()}', 'kcal', Icons.local_fire_department),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
 
-        // Macro pills
+        // Serving scaler
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: Row(
+              children: [
+                IconButton(icon: const Icon(Icons.remove), onPressed: () => setState(() => _scale = (_scale - 0.5).clamp(0.5, 4.0))),
+                Expanded(
+                  child: Slider(
+                    value: _scale,
+                    min: 0.5, max: 4.0, divisions: 7,
+                    label: '${(_scale * (servings ?? 1)).round()} servings',
+                    onChanged: (v) => setState(() => _scale = v),
+                  ),
+                ),
+                IconButton(icon: const Icon(Icons.add), onPressed: () => setState(() => _scale = (_scale + 0.5).clamp(0.5, 4.0))),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // Macro pills (scaled)
         Wrap(
           spacing: 8,
           children: [
-            _macroPill('Protein', '${protein.toStringAsFixed(1)}g', Colors.blue),
-            _macroPill('Fat', '${fat.toStringAsFixed(1)}g', Colors.orange),
-            _macroPill('Carbs', '${carbs.toStringAsFixed(1)}g', Colors.amber),
-            _macroPill('Fiber', '${fiber.toStringAsFixed(1)}g', Colors.green),
+            _macroPill('Protein', '${(protein * _scale).toStringAsFixed(1)}g', Colors.blue),
+            _macroPill('Fat', '${(fat * _scale).toStringAsFixed(1)}g', Colors.orange),
+            _macroPill('Carbs', '${(carbs * _scale).toStringAsFixed(1)}g', Colors.amber),
+            _macroPill('Fiber', '${(fiber * _scale).toStringAsFixed(1)}g', Colors.green),
           ],
         ),
         const SizedBox(height: 12),
@@ -117,7 +165,7 @@ class RecipeDetailScreen extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  ri.amountDisplay ?? '${ri.amountGrams}g',
+                  '${(ri.amountGrams * _scale).toStringAsFixed(0)}g',
                   style: const TextStyle(color: Colors.grey, fontSize: 13),
                 ),
               ],

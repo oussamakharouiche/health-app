@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/database/database.dart';
 import '../../core/services/database_provider.dart';
 import 'recipe_detail_screen.dart';
+import 'recipe_edit_screen.dart';
 
 /// Browse all recipes grouped by meal type, filterable by tags, with search.
 class RecipeDatabaseScreen extends ConsumerStatefulWidget {
@@ -33,6 +34,14 @@ class _RecipeDatabaseScreenState extends ConsumerState<RecipeDatabaseScreen> {
       appBar: AppBar(
         title: const Text('Recipes'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: 'Create recipe',
+            onPressed: () async {
+              await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RecipeEditScreen()));
+              ref.invalidate(_allRecipesProvider);
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: _showFilterSheet,
