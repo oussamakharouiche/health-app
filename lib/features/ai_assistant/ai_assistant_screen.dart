@@ -49,15 +49,18 @@ class _AIAssistantScreenState extends ConsumerState<AIAssistantScreen> {
       appBar: AppBar(
         title: const Text('AI Assistant'),
         actions: [
-          if (!hasKey)
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const LLMSettingsScreen()),
-                );
-              },
-              child: const Text('Set API Key'),
+          IconButton(
+            icon: Icon(
+              hasKey ? Icons.settings : Icons.key,
+              color: hasKey ? null : Colors.orange,
             ),
+            tooltip: hasKey ? 'LLM Settings' : 'Set API Key',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const LLMSettingsScreen()),
+              );
+            },
+          ),
         ],
       ),
       body: Column(

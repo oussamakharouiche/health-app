@@ -9,6 +9,7 @@ import '../../features/shopping_list/shopping_list_screen.dart';
 import '../../features/workout_logger/workout_screen.dart';
 import '../../features/insights/insights_screen.dart';
 import '../../features/ai_assistant/ai_assistant_screen.dart';
+import '../../features/settings/settings_screen.dart';
 import '../widgets/app_shell.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -43,10 +44,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ]),
         ],
       ),
-      GoRoute(
-        path: '/ai-assistant',
-        builder: (_, __) => const AIAssistantScreen(),
-      ),
+      GoRoute(path: '/ai-assistant', builder: (_, __) => const AIAssistantScreen()),
+      GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
     ],
   );
 });

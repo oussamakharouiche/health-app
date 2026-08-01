@@ -52,6 +52,11 @@ class _WideLayout extends StatelessWidget {
                   tooltip: 'AI Assistant',
                   onPressed: () => context.go('/ai-assistant'),
                 ),
+                IconButton(
+                  icon: const Icon(Icons.settings_outlined),
+                  tooltip: 'Settings',
+                  onPressed: () => context.go('/settings'),
+                ),
               ],
             ),
             destinations: const [
