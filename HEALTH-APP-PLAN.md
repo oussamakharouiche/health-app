@@ -562,6 +562,70 @@ This is where Flutter pays off:
 
 ### 5.1 Module: Food & Diet Tracking
 
+#### 5.1.0 Food Database (Reference Catalog)
+
+A standalone page for browsing the entire ingredient database. Think of it as "Google for your food library" — open it anytime, not just when logging a meal.
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  FOOD DATABASE                                           │
+│  🔍 [Search 3,500+ ingredients...]                       │
+│                                                          │
+│  Filter: [All] [🟢 Low FODMAP] [🟡 Moderate] [🔴 High]   │
+│  Category: [All ▼]  Sort: [Name ▼]                       │
+│  FODMAP Group: [All] [Lactose] [Fructose] [Fructans] ... │
+│                                                          │
+│  ┌──────────────────────────────────────────────────────┐│
+│  │ 🟢 Almond butter                    Nuts & Seeds     ││
+│  │   1 tbsp (16g)  ·  98 kcal  ·  3.4g protein         ││
+│  │   Oligos: low  Fructose: low  Polyols: low  Lact: low││
+│  ├──────────────────────────────────────────────────────┤│
+│  │ 🔴 Apple (Granny Smith)             Fruit            ││
+│  │   1 medium (165g)  ·  95 kcal  ·  0.5g protein      ││
+│  │   Oligos: low  Fructose: HIGH  Polyols: HIGH         ││
+│  ├──────────────────────────────────────────────────────┤│
+│  │ 🟢 Carrot                           Vegetables       ││
+│  │   1 medium (61g)  ·  25 kcal  ·  0.6g protein       ││
+│  │   Oligos: low  Fructose: low  Polyols: low  Lact: low││
+│  └──────────────────────────────────────────────────────┘│
+│                                                          │
+│  Showing 847 results for "vegetables", low FODMAP        │
+└──────────────────────────────────────────────────────────┘
+```
+
+**Tap any food to see the full detail view:**
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  🟢 ALMOND BUTTER                                        │
+│  Category: Nuts & Seeds                                  │
+│  Serving: 1 tbsp (16g)                                   │
+│                                                          │
+│  FODMAP PROFILE                                          │
+│  ┌──────────────────────────────────────────────────────┐│
+│  │ Oligos    ██░░░░░░░░  LOW    (0/2)                   ││
+│  │ Fructose  ░░░░░░░░░░  LOW    (0/2)                   ││
+│  │ Polyols   ░░░░░░░░░░  LOW    (0/2)                   ││
+│  │ Lactose   ░░░░░░░░░░  LOW    (0/2)                   ││
+│  │ Overall:  🟢 LOW — safe for all phases               ││
+│  └──────────────────────────────────────────────────────┘│
+│                                                          │
+│  NUTRITION (per 100g)                                    │
+│  ┌──────────────────────────────────────────────────────┐│
+│  │ Energy     614 kcal    Fiber        10.3 g           ││
+│  │ Protein    21.2 g      Calcium      269 mg           ││
+│  │ Fat        55.5 g      Iron          3.5 mg          ││
+│  │  Saturated  4.2 g     Magnesium     270 mg           ││
+│  │ Carbs       6.4 g     Vitamin E     24.2 mg          ││
+│  │  Sugars     4.4 g     ...                            ││
+│  └──────────────────────────────────────────────────────┘│
+│                                                          │
+│  Compatible phases: ✓ Elimination  ✓ Reintroduction      │
+│                                                          │
+│  [+ Add to today's log]  [Add to recipe]                 │
+└──────────────────────────────────────────────────────────┘
+```
+
 #### 5.1.1 Food Diary
 ```
 ┌──────────────────────────────────┐
@@ -1541,12 +1605,15 @@ User types "low FODMAP high protein lunch"
 - [ ] Settings page: user profile (age, sex, weight, height → auto-calculates BMR/TDEE), nutrition targets (pre-filled from ANSES 2021 medical reference values for your profile, adjustable), FODMAP phase, work schedule, LLM configuration
 - [ ] **LLM configuration** — settings UI for API key, provider selection, model, connection test
 
-### Phase 1: Core Services + Food Diary (Weeks 4–5)
+### Phase 1: Core Services + Food Database + Food Diary (Weeks 4–5)
 - [ ] Implement all `lib/core/services/`: NutritionEngine, FODMAPEngine, FoodLogService
 - [ ] Seed data loading — SQLite databases bundled with app, loaded on first launch
-- [ ] Ingredient search with FODMAP filter (Drift FTS5 full-text search)
-- [ ] Food diary MVP — log meals by selecting ingredients/recipes with amounts
+- [ ] **Food Database page** — standalone reference catalog: browse all ingredients with their full nutritional profile, FODMAP traffic light per serving, FODMAP sub-type breakdown (oligos/fructose/polyols/lactose), and category. This is NOT just a search bar inside the food diary — it's a full dedicated page you can open anytime to look up foods (at the store, while planning, learning)
+- [ ] Food Database search engine — Drift FTS5 full-text search with filters: by category, by FODMAP level (low/moderate/high), by FODMAP group (lactose, fructose, fructans, GOS, polyols), sort by name/calories/protein
+- [ ] Food detail view — tap any ingredient to see: full nutrition panel (all 40+ nutrients), FODMAP profile with visual breakdown, safe serving size, which FODMAP phase it's compatible with
+- [ ] Food diary MVP — log meals by selecting ingredients/recipes with amounts (pulls from the same Food Database)
 - [ ] Daily nutrition summary (calories + macros calculated from logged food)
+- [ ] **Recipe Database page** — standalone browse/screen for all recipes. Filters: by meal type (breakfast/lunch/dinner/snack), by tags (high-protein, low-fodmap, quick-breakfast, meal-prep, microwave-friendly, vegetarian, batch-cook), by prep+cook time, by calorie range. Search by name or ingredient. Shows FODMAP level per serving + nutrition summary card. Tap to see full recipe detail with ingredients, instructions, and nutritional breakdown
 - [ ] FODMAP traffic light indicators on every food entry
 
 ### Phase 2: LLM Integration (Weeks 6–7)

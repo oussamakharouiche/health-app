@@ -11,6 +11,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Food Diary'), findsWidgets);
+    // Default test viewport is 800x600 (<900 = narrow layout, 5 tabs visible)
+    expect(find.text('Food'), findsWidgets);
   });
 }

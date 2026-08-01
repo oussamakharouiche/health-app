@@ -46,29 +46,39 @@ class _WideLayout extends StatelessWidget {
             ),
             destinations: const [
               NavigationRailDestination(
-                icon: Icon(Icons.restaurant_outlined),
-                selectedIcon: Icon(Icons.restaurant),
-                label: Text('Food Diary'),
+                icon: Icon(Icons.menu_book_outlined),
+                selectedIcon: Icon(Icons.menu_book),
+                label: Text('Food DB'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.set_meal_outlined),
+                selectedIcon: Icon(Icons.set_meal),
+                label: Text('Recipes'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.edit_note_outlined),
+                selectedIcon: Icon(Icons.edit_note),
+                label: Text('Diary'),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.calendar_month_outlined),
                 selectedIcon: Icon(Icons.calendar_month),
-                label: Text('Meal Plan'),
+                label: Text('Plan'),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.shopping_cart_outlined),
                 selectedIcon: Icon(Icons.shopping_cart),
-                label: Text('Shopping'),
+                label: Text('Shop'),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.fitness_center_outlined),
                 selectedIcon: Icon(Icons.fitness_center),
-                label: Text('Workouts'),
+                label: Text('Train'),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.insights_outlined),
                 selectedIcon: Icon(Icons.insights),
-                label: Text('Insights'),
+                label: Text('Stats'),
               ),
             ],
           ),
@@ -100,29 +110,24 @@ class _NarrowLayout extends StatelessWidget {
         },
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.restaurant_outlined),
-            selectedIcon: Icon(Icons.restaurant),
+            icon: Icon(Icons.menu_book_outlined),
             label: 'Food',
           ),
           NavigationDestination(
+            icon: Icon(Icons.set_meal_outlined),
+            label: 'Recipes',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.edit_note_outlined),
+            label: 'Diary',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.calendar_month_outlined),
-            selectedIcon: Icon(Icons.calendar_month),
-            label: 'Meals',
+            label: 'Plan',
           ),
           NavigationDestination(
             icon: Icon(Icons.shopping_cart_outlined),
-            selectedIcon: Icon(Icons.shopping_cart),
             label: 'Shop',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.fitness_center_outlined),
-            selectedIcon: Icon(Icons.fitness_center),
-            label: 'Train',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.insights_outlined),
-            selectedIcon: Icon(Icons.insights),
-            label: 'Insights',
           ),
         ],
       ),
