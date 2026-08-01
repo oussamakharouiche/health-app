@@ -1,0 +1,39 @@
+# Flutter
+.dart_tool/
+.packages
+build/
+*.iml
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+web/build/
+android/app/build/
+ios/build/
+
+# Generated code
+*.g.dart
+*.freezed.dart
+*.drift.dart
+lib/core/database/database.g.dart
+
+# Secrets
+*.env
+.env.*
+secrets/
+
+# Test coverage
+coverage/
