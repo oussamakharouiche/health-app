@@ -1,0 +1,96 @@
+[
+  {
+    "id": "rec-001",
+    "name": "Chicken & Rice Bowl",
+    "description": "Simple high-protein lunch prep. Microwave-friendly for work.",
+    "instructions": "1. Cook rice according to package directions (about 20 min).\n2. Season chicken breast with salt and olive oil; pan-sear 6-7 min per side until internal temp reaches 74C.\n3. Slice chicken; serve over rice. Add spinach on the side or wilt into the rice.",
+    "prepTimeMin": 10,
+    "cookTimeMin": 25,
+    "defaultServings": 2,
+    "tags": ["lunch", "high-protein", "meal-prep", "microwave-friendly", "low-fodmap"],
+    "ingredients": [
+      {"ingredientId": "ing-001", "amountGrams": 200, "amountDisplay": "200g (2 pieces)"},
+      {"ingredientId": "ing-005", "amountGrams": 300, "amountDisplay": "300g cooked (1.5 cups)"},
+      {"ingredientId": "ing-007", "amountGrams": 50, "amountDisplay": "50g (1 large handful)"},
+      {"ingredientId": "ing-013", "amountGrams": 10, "amountDisplay": "10ml (2 tsp)"}
+    ]
+  },
+  {
+    "id": "rec-002",
+    "name": "Oatmeal with Blueberries",
+    "description": "Quick low-FODMAP breakfast ready in under 10 minutes.",
+    "instructions": "1. Combine oats and lactose-free milk in a bowl.\n2. Microwave for 2-3 minutes, stirring halfway.\n3. Top with fresh blueberries and serve.",
+    "prepTimeMin": 2,
+    "cookTimeMin": 3,
+    "defaultServings": 1,
+    "tags": ["breakfast", "quick-breakfast", "low-fodmap", "vegetarian"],
+    "ingredients": [
+      {"ingredientId": "ing-006", "amountGrams": 60, "amountDisplay": "60g (1/2 cup dry)"},
+      {"ingredientId": "ing-014", "amountGrams": 200, "amountDisplay": "200ml"},
+      {"ingredientId": "ing-010", "amountGrams": 40, "amountDisplay": "40g (1/4 cup)"}
+    ]
+  },
+  {
+    "id": "rec-003",
+    "name": "Salmon & Potato Plate",
+    "description": "Balanced low-FODMAP dinner rich in omega-3 and potassium.",
+    "instructions": "1. Boil potatoes for 15-20 minutes until fork-tender.\n2. Season salmon with olive oil and salt; pan-sear skin-side down 4 min, flip and cook 3 more minutes.\n3. Serve salmon alongside boiled potatoes with a side of steamed carrots.",
+    "prepTimeMin": 10,
+    "cookTimeMin": 25,
+    "defaultServings": 2,
+    "tags": ["dinner", "high-protein", "low-fodmap"],
+    "ingredients": [
+      {"ingredientId": "ing-002", "amountGrams": 300, "amountDisplay": "300g (2 fillets)"},
+      {"ingredientId": "ing-015", "amountGrams": 400, "amountDisplay": "400g (4 medium)"},
+      {"ingredientId": "ing-008", "amountGrams": 200, "amountDisplay": "200g (3 medium)"},
+      {"ingredientId": "ing-013", "amountGrams": 10, "amountDisplay": "10ml (2 tsp)"}
+    ]
+  },
+  {
+    "id": "rec-004",
+    "name": "Greek Yogurt Protein Bowl",
+    "description": "Zero-prep high-protein breakfast or snack.",
+    "instructions": "1. Spoon Greek yogurt into a bowl.\n2. Top with almonds and blueberries.\n3. Serve immediately.",
+    "prepTimeMin": 2,
+    "cookTimeMin": 0,
+    "defaultServings": 1,
+    "tags": ["breakfast", "snack", "quick-breakfast", "high-protein", "vegetarian", "low-fodmap"],
+    "ingredients": [
+      {"ingredientId": "ing-012", "amountGrams": 170, "amountDisplay": "170g (1 small pot)"},
+      {"ingredientId": "ing-011", "amountGrams": 12, "amountDisplay": "12g (10 almonds)"},
+      {"ingredientId": "ing-010", "amountGrams": 40, "amountDisplay": "40g (1/4 cup)"}
+    ]
+  },
+  {
+    "id": "rec-005",
+    "name": "Chicken & Spinach Salad",
+    "description": "Light high-protein lunch; no reheating needed.",
+    "instructions": "1. Pan-sear chicken breast with olive oil, 6-7 min per side. Let rest, then slice.\n2. Toss raw spinach with olive oil and a squeeze of lemon (if tolerated).\n3. Top spinach with sliced chicken, grated carrot, and almonds.",
+    "prepTimeMin": 10,
+    "cookTimeMin": 15,
+    "defaultServings": 1,
+    "tags": ["lunch", "high-protein", "low-fodmap", "quick-breakfast"],
+    "ingredients": [
+      {"ingredientId": "ing-001", "amountGrams": 150, "amountDisplay": "150g (1 piece)"},
+      {"ingredientId": "ing-007", "amountGrams": 80, "amountDisplay": "80g (2 large handfuls)"},
+      {"ingredientId": "ing-008", "amountGrams": 50, "amountDisplay": "50g (1 small, grated)"},
+      {"ingredientId": "ing-011", "amountGrams": 12, "amountDisplay": "12g (10 almonds)"},
+      {"ingredientId": "ing-013", "amountGrams": 10, "amountDisplay": "10ml (2 tsp)"}
+    ]
+  },
+  {
+    "id": "rec-006",
+    "name": "Spinach Omelette",
+    "description": "Quick high-protein breakfast; low FODMAP and ready in 10 minutes.",
+    "instructions": "1. Whisk eggs with a pinch of salt.\n2. Heat a non-stick pan with a little olive oil; pour in eggs.\n3. When edges set, add spinach on one half; fold and cook 1 more minute.\n4. Serve immediately.",
+    "prepTimeMin": 3,
+    "cookTimeMin": 5,
+    "defaultServings": 1,
+    "tags": ["breakfast", "quick-breakfast", "high-protein", "low-fodmap", "vegetarian"],
+    "ingredients": [
+      {"ingredientId": "ing-003", "amountGrams": 150, "amountDisplay": "150g (3 large eggs)"},
+      {"ingredientId": "ing-007", "amountGrams": 30, "amountDisplay": "30g (1 handful)"},
+      {"ingredientId": "ing-013", "amountGrams": 5, "amountDisplay": "5ml (1 tsp)"}
+    ]
+  }
+]

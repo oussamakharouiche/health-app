@@ -18,6 +18,7 @@ class SeedService {
 
     await _seedIngredients();
     await _seedFodmap();
+    await _seedRecipes();
     return true;
   }
 
@@ -97,6 +98,41 @@ class SeedService {
         ),
         mode: drift.InsertMode.insertOrIgnore,
       );
+    }
+  }
+
+  Future<void> _seedRecipes() async {
+    final jsonStr = await rootBundle.loadString('assets/seed_data/recipes.json');
+    final List<dynamic> items = jsonDecode(jsonStr);
+
+    for (final item in items) {
+      await _db.into(_db.recipes).insert(
+        RecipesCompanion(
+          id: drift.Value(item['id'] as String),
+          name: drift.Value(item['name'] as String),
+          description: drift.Value(item['description'] as String?),
+          instructions: drift.Value(item['instructions'] as String?),
+          prepTimeMin: drift.Value((item['prepTimeMin'] as num?)?.toInt()),
+          cookTimeMin: drift.Value((item['cookTimeMin'] as num?)?.toInt()),
+          defaultServings: drift.Value((item['defaultServings'] as num?)?.toDouble() ?? 1.0),
+          tags: drift.Value(item['tags'] as String?),
+        ),
+        mode: drift.InsertMode.insertOrIgnore,
+      );
+
+      final ingredients = item['ingredients'] as List<dynamic>;
+      for (final ing in ingredients) {
+        await _db.into(_db.recipeIngredients).insert(
+          RecipeIngredientsCompanion(
+            id: drift.Value('${item['id']}_${ing['ingredientId']}'),
+            recipeId: drift.Value(item['id'] as String),
+            ingredientId: drift.Value(ing['ingredientId'] as String),
+            amountGrams: drift.Value((ing['amountGrams'] as num).toDouble()),
+            amountDisplay: drift.Value(ing['amountDisplay'] as String?),
+          ),
+          mode: drift.InsertMode.insertOrIgnore,
+        );
+      }
     }
   }
 }
