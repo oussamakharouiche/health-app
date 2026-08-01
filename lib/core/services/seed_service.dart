@@ -13,12 +13,18 @@ class SeedService {
 
   /// Returns true if seed data was loaded, false if already present.
   Future<bool> seedIfEmpty() async {
-    final count = await _db.select(_db.ingredients).get();
-    if (count.isNotEmpty) return false;
+    final ingredients = await _db.select(_db.ingredients).get();
+    final recipes = await _db.select(_db.recipes).get();
 
-    await _seedIngredients();
-    await _seedFodmap();
-    await _seedRecipes();
+    if (ingredients.isNotEmpty && recipes.isNotEmpty) return false;
+
+    if (ingredients.isEmpty) {
+      await _seedIngredients();
+      await _seedFodmap();
+    }
+    if (recipes.isEmpty) {
+      await _seedRecipes();
+    }
     return true;
   }
 
@@ -115,7 +121,7 @@ class SeedService {
           prepTimeMin: drift.Value((item['prepTimeMin'] as num?)?.toInt()),
           cookTimeMin: drift.Value((item['cookTimeMin'] as num?)?.toInt()),
           defaultServings: drift.Value((item['defaultServings'] as num?)?.toDouble() ?? 1.0),
-          tags: drift.Value(item['tags'] as String?),
+          tags: drift.Value(item['tags'] != null ? jsonEncode(item['tags']) : null),
         ),
         mode: drift.InsertMode.insertOrIgnore,
       );
