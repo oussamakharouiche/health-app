@@ -1,7 +1,8 @@
 import 'package:drift/drift.dart';
-import 'package:drift_flutter/drift_flutter.dart';
 
 import 'tables.dart';
+import 'connect_stub.dart'
+    if (dart.library.js_interop) 'connect_web.dart';
 
 part 'database.g.dart';
 
@@ -29,7 +30,7 @@ part 'database.g.dart';
   Settings,
 ])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase() : super(openConnection('health_app'));
 
   @override
   int get schemaVersion => 2;
@@ -45,8 +46,4 @@ class AppDatabase extends _$AppDatabase {
           }
         },
       );
-}
-
-QueryExecutor _openConnection() {
-  return driftDatabase(name: 'health_app');
 }
