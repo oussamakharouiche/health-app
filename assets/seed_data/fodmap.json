@@ -1,0 +1,22 @@
+[
+  {"ingredientId":"ing-001","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"Unlimited","servingGrams":200,"fodmapGroups":"[]","source":"monash_2025"},
+  {"ingredientId":"ing-002","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"Unlimited","servingGrams":200,"fodmapGroups":"[]","source":"monash_2025"},
+  {"ingredientId":"ing-003","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"Unlimited","servingGrams":200,"fodmapGroups":"[]","source":"monash_2025"},
+  {"ingredientId":"ing-004","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"1 cup cooked (190g)","servingGrams":190,"fodmapGroups":"[]","source":"monash_2025"},
+  {"ingredientId":"ing-005","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"1 cup cooked (190g)","servingGrams":190,"fodmapGroups":"[]","source":"monash_2025"},
+  {"ingredientId":"ing-006","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"1/2 cup dry (60g)","servingGrams":60,"fodmapGroups":"[]","source":"monash_2025"},
+  {"ingredientId":"ing-007","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"75g","servingGrams":75,"fodmapGroups":"[]","source":"monash_2025"},
+  {"ingredientId":"ing-008","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"1 medium (61g)","servingGrams":61,"fodmapGroups":"[]","source":"monash_2025"},
+  {"ingredientId":"ing-009","fodmapLevel":"moderate","oligos":0,"fructose":1,"polyols":0,"lactose":0,"servingDescription":"1 medium ripe (100g)","servingGrams":100,"fodmapGroups":"[\"fructose\"]","source":"monash_2025"},
+  {"ingredientId":"ing-010","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"1/4 cup (40g)","servingGrams":40,"fodmapGroups":"[]","source":"monash_2025"},
+  {"ingredientId":"ing-011","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"10 almonds (12g)","servingGrams":12,"fodmapGroups":"[]","source":"monash_2025"},
+  {"ingredientId":"ing-012","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":1,"servingDescription":"1 small pot (170g)","servingGrams":170,"fodmapGroups":"[\"lactose\"]","source":"monash_2024","notes":"Lactose content is low due to straining; most lactose-intolerant people tolerate Greek yogurt"},
+  {"ingredientId":"ing-013","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"1 tbsp (14ml)","servingGrams":14,"fodmapGroups":"[]","source":"monash_2025"},
+  {"ingredientId":"ing-014","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"1 cup (250ml)","servingGrams":250,"fodmapGroups":"[]","source":"monash_2025","notes":"Lactose has been pre-digested; safe for lactose intolerance"},
+  {"ingredientId":"ing-015","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"1 medium (150g)","servingGrams":150,"fodmapGroups":"[]","source":"monash_2025"},
+  {"ingredientId":"ing-016","fodmapLevel":"high","oligos":1,"fructose":2,"polyols":0,"lactose":0,"servingDescription":"Avoid during elimination","servingGrams":10,"fodmapGroups":"[\"fructans\",\"fructose\"]","source":"monash_2025","notes":"High in fructans. Use garlic-infused oil as alternative"},
+  {"ingredientId":"ing-017","fodmapLevel":"high","oligos":2,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"Avoid during elimination","servingGrams":3,"fodmapGroups":"[\"fructans\"]","source":"monash_2025","notes":"High in fructans. Use garlic-infused oil as alternative"},
+  {"ingredientId":"ing-018","fodmapLevel":"high","oligos":0,"fructose":2,"polyols":1,"lactose":0,"servingDescription":"Avoid during elimination","servingGrams":30,"fodmapGroups":"[\"fructose\",\"polyols\"]","source":"monash_2025","notes":"High in excess fructose and sorbitol"},
+  {"ingredientId":"ing-019","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"Unlimited","servingGrams":200,"fodmapGroups":"[]","source":"monash_2025"},
+  {"ingredientId":"ing-020","fodmapLevel":"low","oligos":0,"fructose":0,"polyols":0,"lactose":0,"servingDescription":"40g (2 slices)","servingGrams":40,"fodmapGroups":"[]","source":"monash_2025","notes":"Hard cheeses are naturally low in lactose"}
+]

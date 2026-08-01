@@ -21,7 +21,7 @@ class Ingredients extends Table {
 
 // ─── Nutrition Data (per 100g) ──────────────────────────────────────────────
 
-class NutritionData extends Table {
+class NutritionDataTable extends Table {
   TextColumn get ingredientId => text().references(Ingredients, #id)();
   RealColumn get energyKcal => real().nullable()();
   RealColumn get energyKj => real().nullable()();
@@ -68,7 +68,7 @@ class NutritionData extends Table {
 
 // ─── FODMAP Data ─────────────────────────────────────────────────────────────
 
-class FodmapData extends Table {
+class FodmapDataTable extends Table {
   TextColumn get ingredientId => text().references(Ingredients, #id)();
   TextColumn get fodmapLevel => text()(); // validated in app layer: 'low', 'moderate', 'high'
   IntColumn get oligos => integer().withDefault(const Constant(0))();

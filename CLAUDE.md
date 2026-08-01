@@ -15,8 +15,12 @@ See [HEALTH-APP-PLAN.md](HEALTH-APP-PLAN.md) for the full plan, data model, and 
 ## Build & Run Commands
 
 ```bash
-# Run on web (laptop browser)
+# Run on web (laptop browser) -- with hot reload
 flutter run -d chrome
+# Once running, the terminal accepts these keys:
+#   r  = hot reload (injects updated code, preserves state, ~1s)
+#   R  = hot restart (full restart, resets state)
+#   q  = quit
 
 # Run tests
 flutter test
@@ -33,6 +37,19 @@ flutter build appbundle
 
 # Code generation (Drift, Riverpod, JSON serialization)
 dart run build_runner build --delete-conflicting-outputs
+# After regenerating .g.dart files, press R (hot restart) in the
+# running flutter terminal to pick up the changes.
+```
+
+### When to Use Hot Reload vs Hot Restart vs Full Restart
+
+| Change type | Action |
+|-------------|--------|
+| UI tweaks (colors, text, layout) | Save file; auto hot reload (or press `r`) |
+| Business logic, state changes | Press `r` (hot reload, preserves state) |
+| New variables, constants, init code | Press `R` (hot restart, resets state) |
+| Regenerated `.g.dart` files | Press `R` (hot restart) |
+| New dependency in `pubspec.yaml` | Press `q`, run `flutter pub get`, then `flutter run -d chrome` again |
 
 # Analyze (linter)
 flutter analyze

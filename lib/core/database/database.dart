@@ -7,8 +7,8 @@ part 'database.g.dart';
 
 @DriftDatabase(tables: [
   Ingredients,
-  NutritionData,
-  FodmapData,
+  NutritionDataTable,
+  FodmapDataTable,
   Recipes,
   RecipeIngredients,
   FoodLogs,

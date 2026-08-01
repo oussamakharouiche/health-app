@@ -654,12 +654,12 @@ class IngredientsCompanion extends UpdateCompanion<Ingredient> {
   }
 }
 
-class $NutritionDataTable extends NutritionData
-    with TableInfo<$NutritionDataTable, NutritionDataData> {
+class $NutritionDataTableTable extends NutritionDataTable
+    with TableInfo<$NutritionDataTableTable, NutritionDataTableData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $NutritionDataTable(this.attachedDatabase, [this._alias]);
+  $NutritionDataTableTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _ingredientIdMeta = const VerificationMeta(
     'ingredientId',
   );
@@ -1104,10 +1104,10 @@ class $NutritionDataTable extends NutritionData
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'nutrition_data';
+  static const String $name = 'nutrition_data_table';
   @override
   VerificationContext validateIntegrity(
-    Insertable<NutritionDataData> instance, {
+    Insertable<NutritionDataTableData> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1396,9 +1396,9 @@ class $NutritionDataTable extends NutritionData
   @override
   Set<GeneratedColumn> get $primaryKey => {ingredientId};
   @override
-  NutritionDataData map(Map<String, dynamic> data, {String? tablePrefix}) {
+  NutritionDataTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return NutritionDataData(
+    return NutritionDataTableData(
       ingredientId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}ingredient_id'],
@@ -1551,13 +1551,13 @@ class $NutritionDataTable extends NutritionData
   }
 
   @override
-  $NutritionDataTable createAlias(String alias) {
-    return $NutritionDataTable(attachedDatabase, alias);
+  $NutritionDataTableTable createAlias(String alias) {
+    return $NutritionDataTableTable(attachedDatabase, alias);
   }
 }
 
-class NutritionDataData extends DataClass
-    implements Insertable<NutritionDataData> {
+class NutritionDataTableData extends DataClass
+    implements Insertable<NutritionDataTableData> {
   final String ingredientId;
   final double? energyKcal;
   final double? energyKj;
@@ -1595,7 +1595,7 @@ class NutritionDataData extends DataClass
   final double? vitaminDUg;
   final double? vitaminEMg;
   final double? vitaminKUg;
-  const NutritionDataData({
+  const NutritionDataTableData({
     required this.ingredientId,
     this.energyKcal,
     this.energyKj,
@@ -1749,8 +1749,8 @@ class NutritionDataData extends DataClass
     return map;
   }
 
-  NutritionDataCompanion toCompanion(bool nullToAbsent) {
-    return NutritionDataCompanion(
+  NutritionDataTableCompanion toCompanion(bool nullToAbsent) {
+    return NutritionDataTableCompanion(
       ingredientId: Value(ingredientId),
       energyKcal: energyKcal == null && nullToAbsent
           ? const Value.absent()
@@ -1863,12 +1863,12 @@ class NutritionDataData extends DataClass
     );
   }
 
-  factory NutritionDataData.fromJson(
+  factory NutritionDataTableData.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return NutritionDataData(
+    return NutritionDataTableData(
       ingredientId: serializer.fromJson<String>(json['ingredientId']),
       energyKcal: serializer.fromJson<double?>(json['energyKcal']),
       energyKj: serializer.fromJson<double?>(json['energyKj']),
@@ -1952,7 +1952,7 @@ class NutritionDataData extends DataClass
     };
   }
 
-  NutritionDataData copyWith({
+  NutritionDataTableData copyWith({
     String? ingredientId,
     Value<double?> energyKcal = const Value.absent(),
     Value<double?> energyKj = const Value.absent(),
@@ -1990,7 +1990,7 @@ class NutritionDataData extends DataClass
     Value<double?> vitaminDUg = const Value.absent(),
     Value<double?> vitaminEMg = const Value.absent(),
     Value<double?> vitaminKUg = const Value.absent(),
-  }) => NutritionDataData(
+  }) => NutritionDataTableData(
     ingredientId: ingredientId ?? this.ingredientId,
     energyKcal: energyKcal.present ? energyKcal.value : this.energyKcal,
     energyKj: energyKj.present ? energyKj.value : this.energyKj,
@@ -2031,8 +2031,8 @@ class NutritionDataData extends DataClass
     vitaminEMg: vitaminEMg.present ? vitaminEMg.value : this.vitaminEMg,
     vitaminKUg: vitaminKUg.present ? vitaminKUg.value : this.vitaminKUg,
   );
-  NutritionDataData copyWithCompanion(NutritionDataCompanion data) {
-    return NutritionDataData(
+  NutritionDataTableData copyWithCompanion(NutritionDataTableCompanion data) {
+    return NutritionDataTableData(
       ingredientId: data.ingredientId.present
           ? data.ingredientId.value
           : this.ingredientId,
@@ -2115,7 +2115,7 @@ class NutritionDataData extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('NutritionDataData(')
+    return (StringBuffer('NutritionDataTableData(')
           ..write('ingredientId: $ingredientId, ')
           ..write('energyKcal: $energyKcal, ')
           ..write('energyKj: $energyKj, ')
@@ -2200,7 +2200,7 @@ class NutritionDataData extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is NutritionDataData &&
+      (other is NutritionDataTableData &&
           other.ingredientId == this.ingredientId &&
           other.energyKcal == this.energyKcal &&
           other.energyKj == this.energyKj &&
@@ -2240,7 +2240,8 @@ class NutritionDataData extends DataClass
           other.vitaminKUg == this.vitaminKUg);
 }
 
-class NutritionDataCompanion extends UpdateCompanion<NutritionDataData> {
+class NutritionDataTableCompanion
+    extends UpdateCompanion<NutritionDataTableData> {
   final Value<String> ingredientId;
   final Value<double?> energyKcal;
   final Value<double?> energyKj;
@@ -2279,7 +2280,7 @@ class NutritionDataCompanion extends UpdateCompanion<NutritionDataData> {
   final Value<double?> vitaminEMg;
   final Value<double?> vitaminKUg;
   final Value<int> rowid;
-  const NutritionDataCompanion({
+  const NutritionDataTableCompanion({
     this.ingredientId = const Value.absent(),
     this.energyKcal = const Value.absent(),
     this.energyKj = const Value.absent(),
@@ -2319,7 +2320,7 @@ class NutritionDataCompanion extends UpdateCompanion<NutritionDataData> {
     this.vitaminKUg = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  NutritionDataCompanion.insert({
+  NutritionDataTableCompanion.insert({
     required String ingredientId,
     this.energyKcal = const Value.absent(),
     this.energyKj = const Value.absent(),
@@ -2359,7 +2360,7 @@ class NutritionDataCompanion extends UpdateCompanion<NutritionDataData> {
     this.vitaminKUg = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : ingredientId = Value(ingredientId);
-  static Insertable<NutritionDataData> custom({
+  static Insertable<NutritionDataTableData> custom({
     Expression<String>? ingredientId,
     Expression<double>? energyKcal,
     Expression<double>? energyKj,
@@ -2441,7 +2442,7 @@ class NutritionDataCompanion extends UpdateCompanion<NutritionDataData> {
     });
   }
 
-  NutritionDataCompanion copyWith({
+  NutritionDataTableCompanion copyWith({
     Value<String>? ingredientId,
     Value<double?>? energyKcal,
     Value<double?>? energyKj,
@@ -2481,7 +2482,7 @@ class NutritionDataCompanion extends UpdateCompanion<NutritionDataData> {
     Value<double?>? vitaminKUg,
     Value<int>? rowid,
   }) {
-    return NutritionDataCompanion(
+    return NutritionDataTableCompanion(
       ingredientId: ingredientId ?? this.ingredientId,
       energyKcal: energyKcal ?? this.energyKcal,
       energyKj: energyKj ?? this.energyKj,
@@ -2645,7 +2646,7 @@ class NutritionDataCompanion extends UpdateCompanion<NutritionDataData> {
 
   @override
   String toString() {
-    return (StringBuffer('NutritionDataCompanion(')
+    return (StringBuffer('NutritionDataTableCompanion(')
           ..write('ingredientId: $ingredientId, ')
           ..write('energyKcal: $energyKcal, ')
           ..write('energyKj: $energyKj, ')
@@ -2689,12 +2690,12 @@ class NutritionDataCompanion extends UpdateCompanion<NutritionDataData> {
   }
 }
 
-class $FodmapDataTable extends FodmapData
-    with TableInfo<$FodmapDataTable, FodmapDataData> {
+class $FodmapDataTableTable extends FodmapDataTable
+    with TableInfo<$FodmapDataTableTable, FodmapDataTableData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $FodmapDataTable(this.attachedDatabase, [this._alias]);
+  $FodmapDataTableTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _ingredientIdMeta = const VerificationMeta(
     'ingredientId',
   );
@@ -2847,10 +2848,10 @@ class $FodmapDataTable extends FodmapData
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'fodmap_data';
+  static const String $name = 'fodmap_data_table';
   @override
   VerificationContext validateIntegrity(
-    Insertable<FodmapDataData> instance, {
+    Insertable<FodmapDataTableData> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2955,9 +2956,9 @@ class $FodmapDataTable extends FodmapData
   @override
   Set<GeneratedColumn> get $primaryKey => {ingredientId};
   @override
-  FodmapDataData map(Map<String, dynamic> data, {String? tablePrefix}) {
+  FodmapDataTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return FodmapDataData(
+    return FodmapDataTableData(
       ingredientId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}ingredient_id'],
@@ -3010,12 +3011,13 @@ class $FodmapDataTable extends FodmapData
   }
 
   @override
-  $FodmapDataTable createAlias(String alias) {
-    return $FodmapDataTable(attachedDatabase, alias);
+  $FodmapDataTableTable createAlias(String alias) {
+    return $FodmapDataTableTable(attachedDatabase, alias);
   }
 }
 
-class FodmapDataData extends DataClass implements Insertable<FodmapDataData> {
+class FodmapDataTableData extends DataClass
+    implements Insertable<FodmapDataTableData> {
   final String ingredientId;
   final String fodmapLevel;
   final int oligos;
@@ -3028,7 +3030,7 @@ class FodmapDataData extends DataClass implements Insertable<FodmapDataData> {
   final String? notes;
   final String? source;
   final DateTime? lastVerified;
-  const FodmapDataData({
+  const FodmapDataTableData({
     required this.ingredientId,
     required this.fodmapLevel,
     required this.oligos,
@@ -3072,8 +3074,8 @@ class FodmapDataData extends DataClass implements Insertable<FodmapDataData> {
     return map;
   }
 
-  FodmapDataCompanion toCompanion(bool nullToAbsent) {
-    return FodmapDataCompanion(
+  FodmapDataTableCompanion toCompanion(bool nullToAbsent) {
+    return FodmapDataTableCompanion(
       ingredientId: Value(ingredientId),
       fodmapLevel: Value(fodmapLevel),
       oligos: Value(oligos),
@@ -3101,12 +3103,12 @@ class FodmapDataData extends DataClass implements Insertable<FodmapDataData> {
     );
   }
 
-  factory FodmapDataData.fromJson(
+  factory FodmapDataTableData.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return FodmapDataData(
+    return FodmapDataTableData(
       ingredientId: serializer.fromJson<String>(json['ingredientId']),
       fodmapLevel: serializer.fromJson<String>(json['fodmapLevel']),
       oligos: serializer.fromJson<int>(json['oligos']),
@@ -3142,7 +3144,7 @@ class FodmapDataData extends DataClass implements Insertable<FodmapDataData> {
     };
   }
 
-  FodmapDataData copyWith({
+  FodmapDataTableData copyWith({
     String? ingredientId,
     String? fodmapLevel,
     int? oligos,
@@ -3155,7 +3157,7 @@ class FodmapDataData extends DataClass implements Insertable<FodmapDataData> {
     Value<String?> notes = const Value.absent(),
     Value<String?> source = const Value.absent(),
     Value<DateTime?> lastVerified = const Value.absent(),
-  }) => FodmapDataData(
+  }) => FodmapDataTableData(
     ingredientId: ingredientId ?? this.ingredientId,
     fodmapLevel: fodmapLevel ?? this.fodmapLevel,
     oligos: oligos ?? this.oligos,
@@ -3171,8 +3173,8 @@ class FodmapDataData extends DataClass implements Insertable<FodmapDataData> {
     source: source.present ? source.value : this.source,
     lastVerified: lastVerified.present ? lastVerified.value : this.lastVerified,
   );
-  FodmapDataData copyWithCompanion(FodmapDataCompanion data) {
-    return FodmapDataData(
+  FodmapDataTableData copyWithCompanion(FodmapDataTableCompanion data) {
+    return FodmapDataTableData(
       ingredientId: data.ingredientId.present
           ? data.ingredientId.value
           : this.ingredientId,
@@ -3202,7 +3204,7 @@ class FodmapDataData extends DataClass implements Insertable<FodmapDataData> {
 
   @override
   String toString() {
-    return (StringBuffer('FodmapDataData(')
+    return (StringBuffer('FodmapDataTableData(')
           ..write('ingredientId: $ingredientId, ')
           ..write('fodmapLevel: $fodmapLevel, ')
           ..write('oligos: $oligos, ')
@@ -3237,7 +3239,7 @@ class FodmapDataData extends DataClass implements Insertable<FodmapDataData> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is FodmapDataData &&
+      (other is FodmapDataTableData &&
           other.ingredientId == this.ingredientId &&
           other.fodmapLevel == this.fodmapLevel &&
           other.oligos == this.oligos &&
@@ -3252,7 +3254,7 @@ class FodmapDataData extends DataClass implements Insertable<FodmapDataData> {
           other.lastVerified == this.lastVerified);
 }
 
-class FodmapDataCompanion extends UpdateCompanion<FodmapDataData> {
+class FodmapDataTableCompanion extends UpdateCompanion<FodmapDataTableData> {
   final Value<String> ingredientId;
   final Value<String> fodmapLevel;
   final Value<int> oligos;
@@ -3266,7 +3268,7 @@ class FodmapDataCompanion extends UpdateCompanion<FodmapDataData> {
   final Value<String?> source;
   final Value<DateTime?> lastVerified;
   final Value<int> rowid;
-  const FodmapDataCompanion({
+  const FodmapDataTableCompanion({
     this.ingredientId = const Value.absent(),
     this.fodmapLevel = const Value.absent(),
     this.oligos = const Value.absent(),
@@ -3281,7 +3283,7 @@ class FodmapDataCompanion extends UpdateCompanion<FodmapDataData> {
     this.lastVerified = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  FodmapDataCompanion.insert({
+  FodmapDataTableCompanion.insert({
     required String ingredientId,
     required String fodmapLevel,
     this.oligos = const Value.absent(),
@@ -3297,7 +3299,7 @@ class FodmapDataCompanion extends UpdateCompanion<FodmapDataData> {
     this.rowid = const Value.absent(),
   }) : ingredientId = Value(ingredientId),
        fodmapLevel = Value(fodmapLevel);
-  static Insertable<FodmapDataData> custom({
+  static Insertable<FodmapDataTableData> custom({
     Expression<String>? ingredientId,
     Expression<String>? fodmapLevel,
     Expression<int>? oligos,
@@ -3329,7 +3331,7 @@ class FodmapDataCompanion extends UpdateCompanion<FodmapDataData> {
     });
   }
 
-  FodmapDataCompanion copyWith({
+  FodmapDataTableCompanion copyWith({
     Value<String>? ingredientId,
     Value<String>? fodmapLevel,
     Value<int>? oligos,
@@ -3344,7 +3346,7 @@ class FodmapDataCompanion extends UpdateCompanion<FodmapDataData> {
     Value<DateTime?>? lastVerified,
     Value<int>? rowid,
   }) {
-    return FodmapDataCompanion(
+    return FodmapDataTableCompanion(
       ingredientId: ingredientId ?? this.ingredientId,
       fodmapLevel: fodmapLevel ?? this.fodmapLevel,
       oligos: oligos ?? this.oligos,
@@ -3408,7 +3410,7 @@ class FodmapDataCompanion extends UpdateCompanion<FodmapDataData> {
 
   @override
   String toString() {
-    return (StringBuffer('FodmapDataCompanion(')
+    return (StringBuffer('FodmapDataTableCompanion(')
           ..write('ingredientId: $ingredientId, ')
           ..write('fodmapLevel: $fodmapLevel, ')
           ..write('oligos: $oligos, ')
@@ -13080,8 +13082,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $IngredientsTable ingredients = $IngredientsTable(this);
-  late final $NutritionDataTable nutritionData = $NutritionDataTable(this);
-  late final $FodmapDataTable fodmapData = $FodmapDataTable(this);
+  late final $NutritionDataTableTable nutritionDataTable =
+      $NutritionDataTableTable(this);
+  late final $FodmapDataTableTable fodmapDataTable = $FodmapDataTableTable(
+    this,
+  );
   late final $RecipesTable recipes = $RecipesTable(this);
   late final $RecipeIngredientsTable recipeIngredients =
       $RecipeIngredientsTable(this);
@@ -13111,8 +13116,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     ingredients,
-    nutritionData,
-    fodmapData,
+    nutritionDataTable,
+    fodmapDataTable,
     recipes,
     recipeIngredients,
     foodLogs,
@@ -13169,43 +13174,51 @@ final class $$IngredientsTableReferences
     extends BaseReferences<_$AppDatabase, $IngredientsTable, Ingredient> {
   $$IngredientsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$NutritionDataTable, List<NutritionDataData>>
-  _nutritionDataRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.nutritionData,
-    aliasName: $_aliasNameGenerator(
-      db.ingredients.id,
-      db.nutritionData.ingredientId,
-    ),
-  );
+  static MultiTypedResultKey<
+    $NutritionDataTableTable,
+    List<NutritionDataTableData>
+  >
+  _nutritionDataTableRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.nutritionDataTable,
+        aliasName: $_aliasNameGenerator(
+          db.ingredients.id,
+          db.nutritionDataTable.ingredientId,
+        ),
+      );
 
-  $$NutritionDataTableProcessedTableManager get nutritionDataRefs {
-    final manager = $$NutritionDataTableTableManager(
+  $$NutritionDataTableTableProcessedTableManager get nutritionDataTableRefs {
+    final manager = $$NutritionDataTableTableTableManager(
       $_db,
-      $_db.nutritionData,
+      $_db.nutritionDataTable,
     ).filter((f) => f.ingredientId.id.sqlEquals($_itemColumn<String>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_nutritionDataRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(
+      _nutritionDataTableRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
 
-  static MultiTypedResultKey<$FodmapDataTable, List<FodmapDataData>>
-  _fodmapDataRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.fodmapData,
+  static MultiTypedResultKey<$FodmapDataTableTable, List<FodmapDataTableData>>
+  _fodmapDataTableRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.fodmapDataTable,
     aliasName: $_aliasNameGenerator(
       db.ingredients.id,
-      db.fodmapData.ingredientId,
+      db.fodmapDataTable.ingredientId,
     ),
   );
 
-  $$FodmapDataTableProcessedTableManager get fodmapDataRefs {
-    final manager = $$FodmapDataTableTableManager(
+  $$FodmapDataTableTableProcessedTableManager get fodmapDataTableRefs {
+    final manager = $$FodmapDataTableTableTableManager(
       $_db,
-      $_db.fodmapData,
+      $_db.fodmapDataTable,
     ).filter((f) => f.ingredientId.id.sqlEquals($_itemColumn<String>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_fodmapDataRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(
+      _fodmapDataTableRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -13364,22 +13377,22 @@ class $$IngredientsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  Expression<bool> nutritionDataRefs(
-    Expression<bool> Function($$NutritionDataTableFilterComposer f) f,
+  Expression<bool> nutritionDataTableRefs(
+    Expression<bool> Function($$NutritionDataTableTableFilterComposer f) f,
   ) {
-    final $$NutritionDataTableFilterComposer composer = $composerBuilder(
+    final $$NutritionDataTableTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.nutritionData,
+      referencedTable: $db.nutritionDataTable,
       getReferencedColumn: (t) => t.ingredientId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$NutritionDataTableFilterComposer(
+          }) => $$NutritionDataTableTableFilterComposer(
             $db: $db,
-            $table: $db.nutritionData,
+            $table: $db.nutritionDataTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -13389,22 +13402,22 @@ class $$IngredientsTableFilterComposer
     return f(composer);
   }
 
-  Expression<bool> fodmapDataRefs(
-    Expression<bool> Function($$FodmapDataTableFilterComposer f) f,
+  Expression<bool> fodmapDataTableRefs(
+    Expression<bool> Function($$FodmapDataTableTableFilterComposer f) f,
   ) {
-    final $$FodmapDataTableFilterComposer composer = $composerBuilder(
+    final $$FodmapDataTableTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.fodmapData,
+      referencedTable: $db.fodmapDataTable,
       getReferencedColumn: (t) => t.ingredientId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$FodmapDataTableFilterComposer(
+          }) => $$FodmapDataTableTableFilterComposer(
             $db: $db,
-            $table: $db.fodmapData,
+            $table: $db.fodmapDataTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -13622,47 +13635,48 @@ class $$IngredientsTableAnnotationComposer
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
-  Expression<T> nutritionDataRefs<T extends Object>(
-    Expression<T> Function($$NutritionDataTableAnnotationComposer a) f,
+  Expression<T> nutritionDataTableRefs<T extends Object>(
+    Expression<T> Function($$NutritionDataTableTableAnnotationComposer a) f,
   ) {
-    final $$NutritionDataTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.nutritionData,
-      getReferencedColumn: (t) => t.ingredientId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NutritionDataTableAnnotationComposer(
-            $db: $db,
-            $table: $db.nutritionData,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
+    final $$NutritionDataTableTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.nutritionDataTable,
+          getReferencedColumn: (t) => t.ingredientId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer,
-          ),
-    );
+              }) => $$NutritionDataTableTableAnnotationComposer(
+                $db: $db,
+                $table: $db.nutritionDataTable,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 
-  Expression<T> fodmapDataRefs<T extends Object>(
-    Expression<T> Function($$FodmapDataTableAnnotationComposer a) f,
+  Expression<T> fodmapDataTableRefs<T extends Object>(
+    Expression<T> Function($$FodmapDataTableTableAnnotationComposer a) f,
   ) {
-    final $$FodmapDataTableAnnotationComposer composer = $composerBuilder(
+    final $$FodmapDataTableTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.fodmapData,
+      referencedTable: $db.fodmapDataTable,
       getReferencedColumn: (t) => t.ingredientId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$FodmapDataTableAnnotationComposer(
+          }) => $$FodmapDataTableTableAnnotationComposer(
             $db: $db,
-            $table: $db.fodmapData,
+            $table: $db.fodmapDataTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -13788,8 +13802,8 @@ class $$IngredientsTableTableManager
           (Ingredient, $$IngredientsTableReferences),
           Ingredient,
           PrefetchHooks Function({
-            bool nutritionDataRefs,
-            bool fodmapDataRefs,
+            bool nutritionDataTableRefs,
+            bool fodmapDataTableRefs,
             bool recipeIngredientsRefs,
             bool foodLogsRefs,
             bool pantryItemsRefs,
@@ -13873,8 +13887,8 @@ class $$IngredientsTableTableManager
               .toList(),
           prefetchHooksCallback:
               ({
-                nutritionDataRefs = false,
-                fodmapDataRefs = false,
+                nutritionDataTableRefs = false,
+                fodmapDataTableRefs = false,
                 recipeIngredientsRefs = false,
                 foodLogsRefs = false,
                 pantryItemsRefs = false,
@@ -13883,8 +13897,8 @@ class $$IngredientsTableTableManager
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
-                    if (nutritionDataRefs) db.nutritionData,
-                    if (fodmapDataRefs) db.fodmapData,
+                    if (nutritionDataTableRefs) db.nutritionDataTable,
+                    if (fodmapDataTableRefs) db.fodmapDataTable,
                     if (recipeIngredientsRefs) db.recipeIngredients,
                     if (foodLogsRefs) db.foodLogs,
                     if (pantryItemsRefs) db.pantryItems,
@@ -13893,42 +13907,42 @@ class $$IngredientsTableTableManager
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
                     return [
-                      if (nutritionDataRefs)
+                      if (nutritionDataTableRefs)
                         await $_getPrefetchedData<
                           Ingredient,
                           $IngredientsTable,
-                          NutritionDataData
+                          NutritionDataTableData
                         >(
                           currentTable: table,
                           referencedTable: $$IngredientsTableReferences
-                              ._nutritionDataRefsTable(db),
+                              ._nutritionDataTableRefsTable(db),
                           managerFromTypedResult: (p0) =>
                               $$IngredientsTableReferences(
                                 db,
                                 table,
                                 p0,
-                              ).nutritionDataRefs,
+                              ).nutritionDataTableRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.ingredientId == item.id,
                               ),
                           typedResults: items,
                         ),
-                      if (fodmapDataRefs)
+                      if (fodmapDataTableRefs)
                         await $_getPrefetchedData<
                           Ingredient,
                           $IngredientsTable,
-                          FodmapDataData
+                          FodmapDataTableData
                         >(
                           currentTable: table,
                           referencedTable: $$IngredientsTableReferences
-                              ._fodmapDataRefsTable(db),
+                              ._fodmapDataTableRefsTable(db),
                           managerFromTypedResult: (p0) =>
                               $$IngredientsTableReferences(
                                 db,
                                 table,
                                 p0,
-                              ).fodmapDataRefs,
+                              ).fodmapDataTableRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.ingredientId == item.id,
@@ -14040,16 +14054,16 @@ typedef $$IngredientsTableProcessedTableManager =
       (Ingredient, $$IngredientsTableReferences),
       Ingredient,
       PrefetchHooks Function({
-        bool nutritionDataRefs,
-        bool fodmapDataRefs,
+        bool nutritionDataTableRefs,
+        bool fodmapDataTableRefs,
         bool recipeIngredientsRefs,
         bool foodLogsRefs,
         bool pantryItemsRefs,
         bool shoppingItemsRefs,
       })
     >;
-typedef $$NutritionDataTableCreateCompanionBuilder =
-    NutritionDataCompanion Function({
+typedef $$NutritionDataTableTableCreateCompanionBuilder =
+    NutritionDataTableCompanion Function({
       required String ingredientId,
       Value<double?> energyKcal,
       Value<double?> energyKj,
@@ -14089,8 +14103,8 @@ typedef $$NutritionDataTableCreateCompanionBuilder =
       Value<double?> vitaminKUg,
       Value<int> rowid,
     });
-typedef $$NutritionDataTableUpdateCompanionBuilder =
-    NutritionDataCompanion Function({
+typedef $$NutritionDataTableTableUpdateCompanionBuilder =
+    NutritionDataTableCompanion Function({
       Value<String> ingredientId,
       Value<double?> energyKcal,
       Value<double?> energyKj,
@@ -14131,10 +14145,14 @@ typedef $$NutritionDataTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
-final class $$NutritionDataTableReferences
+final class $$NutritionDataTableTableReferences
     extends
-        BaseReferences<_$AppDatabase, $NutritionDataTable, NutritionDataData> {
-  $$NutritionDataTableReferences(
+        BaseReferences<
+          _$AppDatabase,
+          $NutritionDataTableTable,
+          NutritionDataTableData
+        > {
+  $$NutritionDataTableTableReferences(
     super.$_db,
     super.$_table,
     super.$_typedResult,
@@ -14142,7 +14160,10 @@ final class $$NutritionDataTableReferences
 
   static $IngredientsTable _ingredientIdTable(_$AppDatabase db) =>
       db.ingredients.createAlias(
-        $_aliasNameGenerator(db.nutritionData.ingredientId, db.ingredients.id),
+        $_aliasNameGenerator(
+          db.nutritionDataTable.ingredientId,
+          db.ingredients.id,
+        ),
       );
 
   $$IngredientsTableProcessedTableManager get ingredientId {
@@ -14160,9 +14181,9 @@ final class $$NutritionDataTableReferences
   }
 }
 
-class $$NutritionDataTableFilterComposer
-    extends Composer<_$AppDatabase, $NutritionDataTable> {
-  $$NutritionDataTableFilterComposer({
+class $$NutritionDataTableTableFilterComposer
+    extends Composer<_$AppDatabase, $NutritionDataTableTable> {
+  $$NutritionDataTableTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -14373,9 +14394,9 @@ class $$NutritionDataTableFilterComposer
   }
 }
 
-class $$NutritionDataTableOrderingComposer
-    extends Composer<_$AppDatabase, $NutritionDataTable> {
-  $$NutritionDataTableOrderingComposer({
+class $$NutritionDataTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $NutritionDataTableTable> {
+  $$NutritionDataTableTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -14586,9 +14607,9 @@ class $$NutritionDataTableOrderingComposer
   }
 }
 
-class $$NutritionDataTableAnnotationComposer
-    extends Composer<_$AppDatabase, $NutritionDataTable> {
-  $$NutritionDataTableAnnotationComposer({
+class $$NutritionDataTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $NutritionDataTableTable> {
+  $$NutritionDataTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -14765,32 +14786,37 @@ class $$NutritionDataTableAnnotationComposer
   }
 }
 
-class $$NutritionDataTableTableManager
+class $$NutritionDataTableTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $NutritionDataTable,
-          NutritionDataData,
-          $$NutritionDataTableFilterComposer,
-          $$NutritionDataTableOrderingComposer,
-          $$NutritionDataTableAnnotationComposer,
-          $$NutritionDataTableCreateCompanionBuilder,
-          $$NutritionDataTableUpdateCompanionBuilder,
-          (NutritionDataData, $$NutritionDataTableReferences),
-          NutritionDataData,
+          $NutritionDataTableTable,
+          NutritionDataTableData,
+          $$NutritionDataTableTableFilterComposer,
+          $$NutritionDataTableTableOrderingComposer,
+          $$NutritionDataTableTableAnnotationComposer,
+          $$NutritionDataTableTableCreateCompanionBuilder,
+          $$NutritionDataTableTableUpdateCompanionBuilder,
+          (NutritionDataTableData, $$NutritionDataTableTableReferences),
+          NutritionDataTableData,
           PrefetchHooks Function({bool ingredientId})
         > {
-  $$NutritionDataTableTableManager(_$AppDatabase db, $NutritionDataTable table)
-    : super(
+  $$NutritionDataTableTableTableManager(
+    _$AppDatabase db,
+    $NutritionDataTableTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$NutritionDataTableFilterComposer($db: db, $table: table),
+              $$NutritionDataTableTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$NutritionDataTableOrderingComposer($db: db, $table: table),
+              $$NutritionDataTableTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$NutritionDataTableAnnotationComposer($db: db, $table: table),
+              $$NutritionDataTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
           updateCompanionCallback:
               ({
                 Value<String> ingredientId = const Value.absent(),
@@ -14831,7 +14857,7 @@ class $$NutritionDataTableTableManager
                 Value<double?> vitaminEMg = const Value.absent(),
                 Value<double?> vitaminKUg = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => NutritionDataCompanion(
+              }) => NutritionDataTableCompanion(
                 ingredientId: ingredientId,
                 energyKcal: energyKcal,
                 energyKj: energyKj,
@@ -14911,7 +14937,7 @@ class $$NutritionDataTableTableManager
                 Value<double?> vitaminEMg = const Value.absent(),
                 Value<double?> vitaminKUg = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => NutritionDataCompanion.insert(
+              }) => NutritionDataTableCompanion.insert(
                 ingredientId: ingredientId,
                 energyKcal: energyKcal,
                 energyKj: energyKj,
@@ -14955,7 +14981,7 @@ class $$NutritionDataTableTableManager
               .map(
                 (e) => (
                   e.readTable(table),
-                  $$NutritionDataTableReferences(db, table, e),
+                  $$NutritionDataTableTableReferences(db, table, e),
                 ),
               )
               .toList(),
@@ -14984,11 +15010,13 @@ class $$NutritionDataTableTableManager
                           state.withJoin(
                                 currentTable: table,
                                 currentColumn: table.ingredientId,
-                                referencedTable: $$NutritionDataTableReferences
-                                    ._ingredientIdTable(db),
-                                referencedColumn: $$NutritionDataTableReferences
-                                    ._ingredientIdTable(db)
-                                    .id,
+                                referencedTable:
+                                    $$NutritionDataTableTableReferences
+                                        ._ingredientIdTable(db),
+                                referencedColumn:
+                                    $$NutritionDataTableTableReferences
+                                        ._ingredientIdTable(db)
+                                        .id,
                               )
                               as T;
                     }
@@ -15004,22 +15032,22 @@ class $$NutritionDataTableTableManager
       );
 }
 
-typedef $$NutritionDataTableProcessedTableManager =
+typedef $$NutritionDataTableTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $NutritionDataTable,
-      NutritionDataData,
-      $$NutritionDataTableFilterComposer,
-      $$NutritionDataTableOrderingComposer,
-      $$NutritionDataTableAnnotationComposer,
-      $$NutritionDataTableCreateCompanionBuilder,
-      $$NutritionDataTableUpdateCompanionBuilder,
-      (NutritionDataData, $$NutritionDataTableReferences),
-      NutritionDataData,
+      $NutritionDataTableTable,
+      NutritionDataTableData,
+      $$NutritionDataTableTableFilterComposer,
+      $$NutritionDataTableTableOrderingComposer,
+      $$NutritionDataTableTableAnnotationComposer,
+      $$NutritionDataTableTableCreateCompanionBuilder,
+      $$NutritionDataTableTableUpdateCompanionBuilder,
+      (NutritionDataTableData, $$NutritionDataTableTableReferences),
+      NutritionDataTableData,
       PrefetchHooks Function({bool ingredientId})
     >;
-typedef $$FodmapDataTableCreateCompanionBuilder =
-    FodmapDataCompanion Function({
+typedef $$FodmapDataTableTableCreateCompanionBuilder =
+    FodmapDataTableCompanion Function({
       required String ingredientId,
       required String fodmapLevel,
       Value<int> oligos,
@@ -15034,8 +15062,8 @@ typedef $$FodmapDataTableCreateCompanionBuilder =
       Value<DateTime?> lastVerified,
       Value<int> rowid,
     });
-typedef $$FodmapDataTableUpdateCompanionBuilder =
-    FodmapDataCompanion Function({
+typedef $$FodmapDataTableTableUpdateCompanionBuilder =
+    FodmapDataTableCompanion Function({
       Value<String> ingredientId,
       Value<String> fodmapLevel,
       Value<int> oligos,
@@ -15051,13 +15079,25 @@ typedef $$FodmapDataTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
-final class $$FodmapDataTableReferences
-    extends BaseReferences<_$AppDatabase, $FodmapDataTable, FodmapDataData> {
-  $$FodmapDataTableReferences(super.$_db, super.$_table, super.$_typedResult);
+final class $$FodmapDataTableTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $FodmapDataTableTable,
+          FodmapDataTableData
+        > {
+  $$FodmapDataTableTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
 
   static $IngredientsTable _ingredientIdTable(_$AppDatabase db) =>
       db.ingredients.createAlias(
-        $_aliasNameGenerator(db.fodmapData.ingredientId, db.ingredients.id),
+        $_aliasNameGenerator(
+          db.fodmapDataTable.ingredientId,
+          db.ingredients.id,
+        ),
       );
 
   $$IngredientsTableProcessedTableManager get ingredientId {
@@ -15075,9 +15115,9 @@ final class $$FodmapDataTableReferences
   }
 }
 
-class $$FodmapDataTableFilterComposer
-    extends Composer<_$AppDatabase, $FodmapDataTable> {
-  $$FodmapDataTableFilterComposer({
+class $$FodmapDataTableTableFilterComposer
+    extends Composer<_$AppDatabase, $FodmapDataTableTable> {
+  $$FodmapDataTableTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -15163,9 +15203,9 @@ class $$FodmapDataTableFilterComposer
   }
 }
 
-class $$FodmapDataTableOrderingComposer
-    extends Composer<_$AppDatabase, $FodmapDataTable> {
-  $$FodmapDataTableOrderingComposer({
+class $$FodmapDataTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $FodmapDataTableTable> {
+  $$FodmapDataTableTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -15251,9 +15291,9 @@ class $$FodmapDataTableOrderingComposer
   }
 }
 
-class $$FodmapDataTableAnnotationComposer
-    extends Composer<_$AppDatabase, $FodmapDataTable> {
-  $$FodmapDataTableAnnotationComposer({
+class $$FodmapDataTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FodmapDataTableTable> {
+  $$FodmapDataTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -15327,32 +15367,34 @@ class $$FodmapDataTableAnnotationComposer
   }
 }
 
-class $$FodmapDataTableTableManager
+class $$FodmapDataTableTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $FodmapDataTable,
-          FodmapDataData,
-          $$FodmapDataTableFilterComposer,
-          $$FodmapDataTableOrderingComposer,
-          $$FodmapDataTableAnnotationComposer,
-          $$FodmapDataTableCreateCompanionBuilder,
-          $$FodmapDataTableUpdateCompanionBuilder,
-          (FodmapDataData, $$FodmapDataTableReferences),
-          FodmapDataData,
+          $FodmapDataTableTable,
+          FodmapDataTableData,
+          $$FodmapDataTableTableFilterComposer,
+          $$FodmapDataTableTableOrderingComposer,
+          $$FodmapDataTableTableAnnotationComposer,
+          $$FodmapDataTableTableCreateCompanionBuilder,
+          $$FodmapDataTableTableUpdateCompanionBuilder,
+          (FodmapDataTableData, $$FodmapDataTableTableReferences),
+          FodmapDataTableData,
           PrefetchHooks Function({bool ingredientId})
         > {
-  $$FodmapDataTableTableManager(_$AppDatabase db, $FodmapDataTable table)
-    : super(
+  $$FodmapDataTableTableTableManager(
+    _$AppDatabase db,
+    $FodmapDataTableTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$FodmapDataTableFilterComposer($db: db, $table: table),
+              $$FodmapDataTableTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$FodmapDataTableOrderingComposer($db: db, $table: table),
+              $$FodmapDataTableTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$FodmapDataTableAnnotationComposer($db: db, $table: table),
+              $$FodmapDataTableTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> ingredientId = const Value.absent(),
@@ -15368,7 +15410,7 @@ class $$FodmapDataTableTableManager
                 Value<String?> source = const Value.absent(),
                 Value<DateTime?> lastVerified = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => FodmapDataCompanion(
+              }) => FodmapDataTableCompanion(
                 ingredientId: ingredientId,
                 fodmapLevel: fodmapLevel,
                 oligos: oligos,
@@ -15398,7 +15440,7 @@ class $$FodmapDataTableTableManager
                 Value<String?> source = const Value.absent(),
                 Value<DateTime?> lastVerified = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => FodmapDataCompanion.insert(
+              }) => FodmapDataTableCompanion.insert(
                 ingredientId: ingredientId,
                 fodmapLevel: fodmapLevel,
                 oligos: oligos,
@@ -15417,7 +15459,7 @@ class $$FodmapDataTableTableManager
               .map(
                 (e) => (
                   e.readTable(table),
-                  $$FodmapDataTableReferences(db, table, e),
+                  $$FodmapDataTableTableReferences(db, table, e),
                 ),
               )
               .toList(),
@@ -15446,11 +15488,13 @@ class $$FodmapDataTableTableManager
                           state.withJoin(
                                 currentTable: table,
                                 currentColumn: table.ingredientId,
-                                referencedTable: $$FodmapDataTableReferences
-                                    ._ingredientIdTable(db),
-                                referencedColumn: $$FodmapDataTableReferences
-                                    ._ingredientIdTable(db)
-                                    .id,
+                                referencedTable:
+                                    $$FodmapDataTableTableReferences
+                                        ._ingredientIdTable(db),
+                                referencedColumn:
+                                    $$FodmapDataTableTableReferences
+                                        ._ingredientIdTable(db)
+                                        .id,
                               )
                               as T;
                     }
@@ -15466,18 +15510,18 @@ class $$FodmapDataTableTableManager
       );
 }
 
-typedef $$FodmapDataTableProcessedTableManager =
+typedef $$FodmapDataTableTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $FodmapDataTable,
-      FodmapDataData,
-      $$FodmapDataTableFilterComposer,
-      $$FodmapDataTableOrderingComposer,
-      $$FodmapDataTableAnnotationComposer,
-      $$FodmapDataTableCreateCompanionBuilder,
-      $$FodmapDataTableUpdateCompanionBuilder,
-      (FodmapDataData, $$FodmapDataTableReferences),
-      FodmapDataData,
+      $FodmapDataTableTable,
+      FodmapDataTableData,
+      $$FodmapDataTableTableFilterComposer,
+      $$FodmapDataTableTableOrderingComposer,
+      $$FodmapDataTableTableAnnotationComposer,
+      $$FodmapDataTableTableCreateCompanionBuilder,
+      $$FodmapDataTableTableUpdateCompanionBuilder,
+      (FodmapDataTableData, $$FodmapDataTableTableReferences),
+      FodmapDataTableData,
       PrefetchHooks Function({bool ingredientId})
     >;
 typedef $$RecipesTableCreateCompanionBuilder =
@@ -22436,10 +22480,10 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$IngredientsTableTableManager get ingredients =>
       $$IngredientsTableTableManager(_db, _db.ingredients);
-  $$NutritionDataTableTableManager get nutritionData =>
-      $$NutritionDataTableTableManager(_db, _db.nutritionData);
-  $$FodmapDataTableTableManager get fodmapData =>
-      $$FodmapDataTableTableManager(_db, _db.fodmapData);
+  $$NutritionDataTableTableTableManager get nutritionDataTable =>
+      $$NutritionDataTableTableTableManager(_db, _db.nutritionDataTable);
+  $$FodmapDataTableTableTableManager get fodmapDataTable =>
+      $$FodmapDataTableTableTableManager(_db, _db.fodmapDataTable);
   $$RecipesTableTableManager get recipes =>
       $$RecipesTableTableManager(_db, _db.recipes);
   $$RecipeIngredientsTableTableManager get recipeIngredients =>
