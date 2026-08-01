@@ -260,14 +260,29 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
           .map((r) => '- ${r.name} (${r.id}): ${_parseTags(r.tags).join(", ")}')
           .join('\n');
 
+      // Fetch pantry items for waste-minimization
+      final db = ref.read(databaseProvider);
+      final pantryItems = await db.select(db.pantryItems).get();
+      final pantryList = pantryItems.isNotEmpty
+          ? pantryItems.map((p) {
+              final daysAgo = p.purchasedAt != null
+                  ? DateTime.now().difference(p.purchasedAt!).inDays
+                  : null;
+              return '- ${p.name} (${p.quantityText ?? "${p.quantityGramsEst?.round() ?? 0}g"})${daysAgo != null ? " — bought $daysAgo days ago" : ""}${daysAgo != null && daysAgo > 5 ? " ⚠️ USE SOON" : ""}';
+            }).join('\n')
+          : '(pantry is empty)';
+
       final response = await llmService.chat(
         systemPrompt: 'You are a meal planner. Given a list of available recipes, assign them to days and meal slots for a FULL 7-DAY WEEK (Monday through Sunday). '
             'Consider variety: do not repeat the same recipe too often. Vary breakfasts, lunches, and dinners. '
             'For weekends (Saturday, Sunday), you can be more relaxed (brunch-style breakfasts, more elaborate dinners). '
+            'CRITICAL: You also have a pantry with ingredients listed below. Prioritize recipes that use ingredients marked "⚠️ USE SOON" or bought more than 5 days ago. '
+            'This minimizes food waste. However, still ensure the overall plan meets nutritional balance and the user is on a LOW FODMAP diet. '
             'Return ONLY a JSON object with keys as "YYYY-MM-DD" dates and values as objects with meal types (breakfast, lunch, dinner, snack) mapping to recipe IDs. '
             'EVERY day must have at least breakfast, lunch, and dinner assigned.',
-        userPrompt: 'Available recipes:\n$recipeList\n\nWeek starting Monday: ${DateFormat("yyyy-MM-dd").format(_weekStart)}. '
-            'Plan ALL 7 days (Mon-Sun). Only use the recipe IDs provided. Return valid JSON.',
+        userPrompt: 'Available recipes:\n$recipeList\n\nPantry ingredients (prioritize soon-to-expire items):\n$pantryList\n\n'
+            'Week starting Monday: ${DateFormat("yyyy-MM-dd").format(_weekStart)}. '
+            'Plan ALL 7 days (Mon-Sun). Only use the recipe IDs provided. Prioritize recipes that use pantry items marked ⚠️ USE SOON. Return valid JSON.',
       );
 
       final json = _extractJson(response.content);

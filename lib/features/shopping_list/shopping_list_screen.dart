@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart' as drift;
+import 'package:intl/intl.dart';
 
 import '../../core/database/database.dart';
 import '../../core/services/database_provider.dart';
@@ -137,6 +138,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                         quantityGramsEst: drift.Value(grams ?? 100),
                         quantityText: drift.Value('${(grams ?? 100).round()}g'),
                         category: drift.Value(item.category),
+                        purchasedAt: drift.Value(DateTime.now()),
                         updatedAt: drift.Value(DateTime.now()),
                       ),
                       mode: drift.InsertMode.insertOrReplace,
@@ -174,9 +176,15 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
             itemCount: items.length,
             itemBuilder: (_, i) {
               final item = items[i];
+              final daysAgo = item.purchasedAt != null
+                  ? DateTime.now().difference(item.purchasedAt!).inDays
+                  : null;
               return ListTile(
                 title: Text(item.name),
-                subtitle: Text(item.quantityText ?? '${item.quantityGramsEst?.round() ?? 0}g'),
+                subtitle: Text([
+                  item.quantityText ?? '${item.quantityGramsEst?.round() ?? 0}g',
+                  if (daysAgo != null) 'bought $daysAgo days ago',
+                ].join(' · ')),
                 trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                   if (item.isStaple) const Icon(Icons.star, size: 16, color: Colors.amber),
                   IconButton(icon: const Icon(Icons.delete, size: 18), onPressed: () async {
@@ -203,19 +211,33 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
   Future<void> _addItem(BuildContext context) async {
     final nameCtrl = TextEditingController();
     final qtyCtrl = TextEditingController();
+    DateTime purchaseDate = DateTime.now();
+
     final result = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Add pantry item'),
-        content: Column(mainAxisSize: MainAxisSize.min, children: [
-          TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Name', border: OutlineInputBorder())),
-          const SizedBox(height: 8),
-          TextField(controller: qtyCtrl, decoration: const InputDecoration(labelText: 'Quantity (e.g. 500g)', border: OutlineInputBorder())),
-        ]),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Add')),
-        ],
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDlgState) => AlertDialog(
+          title: const Text('Add pantry item'),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Name', border: OutlineInputBorder())),
+            const SizedBox(height: 8),
+            TextField(controller: qtyCtrl, decoration: const InputDecoration(labelText: 'Quantity (e.g. 500g)', border: OutlineInputBorder())),
+            const SizedBox(height: 8),
+            ListTile(
+              dense: true,
+              leading: const Icon(Icons.calendar_today, size: 20),
+              title: Text('Purchased: ${DateFormat('MMM d').format(purchaseDate)}'),
+              onTap: () async {
+                final picked = await showDatePicker(context: ctx, initialDate: purchaseDate, firstDate: DateTime(2020), lastDate: DateTime.now());
+                if (picked != null) setDlgState(() => purchaseDate = picked);
+              },
+            ),
+          ]),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Add')),
+          ],
+        ),
       ),
     );
     if (result == true && nameCtrl.text.isNotEmpty) {
@@ -226,12 +248,15 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
           name: drift.Value(nameCtrl.text.trim()),
           quantityText: drift.Value(qtyCtrl.text.trim().isEmpty ? null : qtyCtrl.text.trim()),
           isStaple: const drift.Value(false),
+          purchasedAt: drift.Value(purchaseDate),
           updatedAt: drift.Value(DateTime.now()),
         ),
         mode: drift.InsertMode.insertOrReplace,
       );
       ref.invalidate(_pantryProvider);
     }
+    nameCtrl.dispose();
+    qtyCtrl.dispose();
   }
 
   Future<void> _editItem(BuildContext context, PantryItem item) async {

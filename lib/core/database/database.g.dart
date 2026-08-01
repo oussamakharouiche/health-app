@@ -10721,6 +10721,17 @@ class $PantryItemsTable extends PantryItems
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _purchasedAtMeta = const VerificationMeta(
+    'purchasedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> purchasedAt = GeneratedColumn<DateTime>(
+    'purchased_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -10743,6 +10754,7 @@ class $PantryItemsTable extends PantryItems
     isStaple,
     lowStockThreshold,
     category,
+    purchasedAt,
     updatedAt,
   ];
   @override
@@ -10818,6 +10830,15 @@ class $PantryItemsTable extends PantryItems
         category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
       );
     }
+    if (data.containsKey('purchased_at')) {
+      context.handle(
+        _purchasedAtMeta,
+        purchasedAt.isAcceptableOrUnknown(
+          data['purchased_at']!,
+          _purchasedAtMeta,
+        ),
+      );
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -10865,6 +10886,10 @@ class $PantryItemsTable extends PantryItems
         DriftSqlType.string,
         data['${effectivePrefix}category'],
       ),
+      purchasedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}purchased_at'],
+      ),
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -10887,6 +10912,7 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
   final bool isStaple;
   final String? lowStockThreshold;
   final String? category;
+  final DateTime? purchasedAt;
   final DateTime updatedAt;
   const PantryItem({
     required this.id,
@@ -10897,6 +10923,7 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
     required this.isStaple,
     this.lowStockThreshold,
     this.category,
+    this.purchasedAt,
     required this.updatedAt,
   });
   @override
@@ -10919,6 +10946,9 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
     }
     if (!nullToAbsent || category != null) {
       map['category'] = Variable<String>(category);
+    }
+    if (!nullToAbsent || purchasedAt != null) {
+      map['purchased_at'] = Variable<DateTime>(purchasedAt);
     }
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -10944,6 +10974,9 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
       category: category == null && nullToAbsent
           ? const Value.absent()
           : Value(category),
+      purchasedAt: purchasedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(purchasedAt),
       updatedAt: Value(updatedAt),
     );
   }
@@ -10964,6 +10997,7 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
         json['lowStockThreshold'],
       ),
       category: serializer.fromJson<String?>(json['category']),
+      purchasedAt: serializer.fromJson<DateTime?>(json['purchasedAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -10979,6 +11013,7 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
       'isStaple': serializer.toJson<bool>(isStaple),
       'lowStockThreshold': serializer.toJson<String?>(lowStockThreshold),
       'category': serializer.toJson<String?>(category),
+      'purchasedAt': serializer.toJson<DateTime?>(purchasedAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -10992,6 +11027,7 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
     bool? isStaple,
     Value<String?> lowStockThreshold = const Value.absent(),
     Value<String?> category = const Value.absent(),
+    Value<DateTime?> purchasedAt = const Value.absent(),
     DateTime? updatedAt,
   }) => PantryItem(
     id: id ?? this.id,
@@ -11006,6 +11042,7 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
         ? lowStockThreshold.value
         : this.lowStockThreshold,
     category: category.present ? category.value : this.category,
+    purchasedAt: purchasedAt.present ? purchasedAt.value : this.purchasedAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   PantryItem copyWithCompanion(PantryItemsCompanion data) {
@@ -11026,6 +11063,9 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
           ? data.lowStockThreshold.value
           : this.lowStockThreshold,
       category: data.category.present ? data.category.value : this.category,
+      purchasedAt: data.purchasedAt.present
+          ? data.purchasedAt.value
+          : this.purchasedAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -11041,6 +11081,7 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
           ..write('isStaple: $isStaple, ')
           ..write('lowStockThreshold: $lowStockThreshold, ')
           ..write('category: $category, ')
+          ..write('purchasedAt: $purchasedAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -11056,6 +11097,7 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
     isStaple,
     lowStockThreshold,
     category,
+    purchasedAt,
     updatedAt,
   );
   @override
@@ -11070,6 +11112,7 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
           other.isStaple == this.isStaple &&
           other.lowStockThreshold == this.lowStockThreshold &&
           other.category == this.category &&
+          other.purchasedAt == this.purchasedAt &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -11082,6 +11125,7 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
   final Value<bool> isStaple;
   final Value<String?> lowStockThreshold;
   final Value<String?> category;
+  final Value<DateTime?> purchasedAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const PantryItemsCompanion({
@@ -11093,6 +11137,7 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
     this.isStaple = const Value.absent(),
     this.lowStockThreshold = const Value.absent(),
     this.category = const Value.absent(),
+    this.purchasedAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -11105,6 +11150,7 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
     this.isStaple = const Value.absent(),
     this.lowStockThreshold = const Value.absent(),
     this.category = const Value.absent(),
+    this.purchasedAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -11118,6 +11164,7 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
     Expression<bool>? isStaple,
     Expression<String>? lowStockThreshold,
     Expression<String>? category,
+    Expression<DateTime>? purchasedAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
@@ -11130,6 +11177,7 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
       if (isStaple != null) 'is_staple': isStaple,
       if (lowStockThreshold != null) 'low_stock_threshold': lowStockThreshold,
       if (category != null) 'category': category,
+      if (purchasedAt != null) 'purchased_at': purchasedAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -11144,6 +11192,7 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
     Value<bool>? isStaple,
     Value<String?>? lowStockThreshold,
     Value<String?>? category,
+    Value<DateTime?>? purchasedAt,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
   }) {
@@ -11156,6 +11205,7 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
       isStaple: isStaple ?? this.isStaple,
       lowStockThreshold: lowStockThreshold ?? this.lowStockThreshold,
       category: category ?? this.category,
+      purchasedAt: purchasedAt ?? this.purchasedAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -11188,6 +11238,9 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
     if (category.present) {
       map['category'] = Variable<String>(category.value);
     }
+    if (purchasedAt.present) {
+      map['purchased_at'] = Variable<DateTime>(purchasedAt.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -11208,6 +11261,7 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
           ..write('isStaple: $isStaple, ')
           ..write('lowStockThreshold: $lowStockThreshold, ')
           ..write('category: $category, ')
+          ..write('purchasedAt: $purchasedAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -20806,6 +20860,7 @@ typedef $$PantryItemsTableCreateCompanionBuilder =
       Value<bool> isStaple,
       Value<String?> lowStockThreshold,
       Value<String?> category,
+      Value<DateTime?> purchasedAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
     });
@@ -20819,6 +20874,7 @@ typedef $$PantryItemsTableUpdateCompanionBuilder =
       Value<bool> isStaple,
       Value<String?> lowStockThreshold,
       Value<String?> category,
+      Value<DateTime?> purchasedAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
     });
@@ -20888,6 +20944,11 @@ class $$PantryItemsTableFilterComposer
 
   ColumnFilters<String> get category => $composableBuilder(
     column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get purchasedAt => $composableBuilder(
+    column: $table.purchasedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -20964,6 +21025,11 @@ class $$PantryItemsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get purchasedAt => $composableBuilder(
+    column: $table.purchasedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -21029,6 +21095,11 @@ class $$PantryItemsTableAnnotationComposer
   GeneratedColumn<String> get category =>
       $composableBuilder(column: $table.category, builder: (column) => column);
 
+  GeneratedColumn<DateTime> get purchasedAt => $composableBuilder(
+    column: $table.purchasedAt,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
@@ -21092,6 +21163,7 @@ class $$PantryItemsTableTableManager
                 Value<bool> isStaple = const Value.absent(),
                 Value<String?> lowStockThreshold = const Value.absent(),
                 Value<String?> category = const Value.absent(),
+                Value<DateTime?> purchasedAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PantryItemsCompanion(
@@ -21103,6 +21175,7 @@ class $$PantryItemsTableTableManager
                 isStaple: isStaple,
                 lowStockThreshold: lowStockThreshold,
                 category: category,
+                purchasedAt: purchasedAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
@@ -21116,6 +21189,7 @@ class $$PantryItemsTableTableManager
                 Value<bool> isStaple = const Value.absent(),
                 Value<String?> lowStockThreshold = const Value.absent(),
                 Value<String?> category = const Value.absent(),
+                Value<DateTime?> purchasedAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PantryItemsCompanion.insert(
@@ -21127,6 +21201,7 @@ class $$PantryItemsTableTableManager
                 isStaple: isStaple,
                 lowStockThreshold: lowStockThreshold,
                 category: category,
+                purchasedAt: purchasedAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),

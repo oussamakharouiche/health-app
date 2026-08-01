@@ -302,6 +302,7 @@ class PantryItems extends Table {
   BoolColumn get isStaple => boolean().withDefault(const Constant(false))();
   TextColumn get lowStockThreshold => text().nullable()();
   TextColumn get category => text().nullable()();
+  DateTimeColumn get purchasedAt => dateTime().nullable()();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
   @override
