@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/services/llm_provider.dart';
 import '../../core/services/llm_service.dart';
+import '../settings/llm_settings_screen.dart';
 
 /// AI-powered diet assistant: ask questions, get meal analysis, search recipes.
 class AIAssistantScreen extends ConsumerStatefulWidget {
@@ -51,8 +52,9 @@ class _AIAssistantScreenState extends ConsumerState<AIAssistantScreen> {
           if (!hasKey)
             TextButton(
               onPressed: () {
-                // Navigate to settings > LLM config
-                Navigator.of(context).pushNamed('/food-database'); // placeholder
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const LLMSettingsScreen()),
+                );
               },
               child: const Text('Set API Key'),
             ),

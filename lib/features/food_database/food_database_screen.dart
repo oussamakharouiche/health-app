@@ -6,6 +6,7 @@ import '../../core/database/database.dart';
 import '../../core/services/database_provider.dart';
 import '../../core/services/llm_provider.dart';
 import '../../core/services/llm_service.dart';
+import '../settings/llm_settings_screen.dart';
 import 'food_detail_screen.dart';
 
 /// Browse all ingredients with FODMAP traffic lights, nutrition, search, filters.
@@ -170,7 +171,17 @@ class _FoodDatabaseScreenState extends ConsumerState<FoodDatabaseScreen> {
     final llmService = ref.read(llmServiceProvider);
     if (llmService == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Configure your API key in Settings first')),
+        SnackBar(
+          content: const Text('Configure your API key first'),
+          action: SnackBarAction(
+            label: 'Settings',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const LLMSettingsScreen()),
+              );
+            },
+          ),
+        ),
       );
       return;
     }
