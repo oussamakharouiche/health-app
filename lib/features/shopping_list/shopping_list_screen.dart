@@ -102,8 +102,47 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
               value: item.isChecked,
               onChanged: (v) async {
                 final db = ref.read(databaseProvider);
+                final checked = v ?? false;
                 await (db.update(db.shoppingItems)..where((t) => t.id.equals(item.id)))
-                    .write(ShoppingItemsCompanion(isChecked: drift.Value(v ?? false)));
+                    .write(ShoppingItemsCompanion(isChecked: drift.Value(checked)));
+                // Auto-add to pantry when checked
+                if (checked && item.ingredientId != null) {
+                  // Extract grams from amount string like "400g"
+                  double? grams;
+                  final amount = item.amount ?? '';
+                  final match = RegExp(r'(\d+)g').firstMatch(amount);
+                  if (match != null) grams = double.tryParse(match.group(1)!);
+
+                  final existing = await (db.select(db.pantryItems)
+                        ..where((t) => t.ingredientId.equals(item.ingredientId!)))
+                      .getSingleOrNull();
+                  if (existing != null) {
+                    // Update quantity
+                    final newQty = (existing.quantityGramsEst ?? 0) + (grams ?? 100);
+                    await (db.update(db.pantryItems)..where((t) => t.id.equals(existing.id)))
+                        .write(PantryItemsCompanion(
+                          quantityGramsEst: drift.Value(newQty),
+                          quantityText: drift.Value('${newQty.round()}g'),
+                          updatedAt: drift.Value(DateTime.now()),
+                        ));
+                  } else {
+                    // Insert new pantry item
+                    final allIngredients = await db.select(db.ingredients).get();
+                    final ing = allIngredients.where((i) => i.id == item.ingredientId!).firstOrNull;
+                    await db.into(db.pantryItems).insert(
+                      PantryItemsCompanion(
+                        id: drift.Value('pantry-${DateTime.now().microsecondsSinceEpoch}'),
+                        ingredientId: drift.Value(item.ingredientId),
+                        name: drift.Value(ing?.name ?? item.name),
+                        quantityGramsEst: drift.Value(grams ?? 100),
+                        quantityText: drift.Value('${(grams ?? 100).round()}g'),
+                        category: drift.Value(item.category),
+                        updatedAt: drift.Value(DateTime.now()),
+                      ),
+                      mode: drift.InsertMode.insertOrReplace,
+                    );
+                  }
+                }
                 ref.invalidate(_shoppingItemsProvider(_selectedListId!));
               },
             )),

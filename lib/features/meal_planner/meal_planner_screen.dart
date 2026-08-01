@@ -9,7 +9,7 @@ import '../../core/services/database_provider.dart';
 import '../../core/services/llm_provider.dart';
 import '../../core/services/llm_service.dart';
 
-/// Weekly meal planner: assign recipes to days, toggle work schedule, LLM generation.
+/// Weekly meal planner with database persistence.
 class MealPlannerScreen extends ConsumerStatefulWidget {
   const MealPlannerScreen({super.key});
 
@@ -19,8 +19,55 @@ class MealPlannerScreen extends ConsumerStatefulWidget {
 
 class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
   DateTime _weekStart = _findMonday(DateTime.now());
-  final _mealTypes = ['breakfast', 'lunch', 'dinner', 'snack'];
-  final Map<String, Map<String, String?>> _plan = {}; // day -> mealType -> recipeId
+  static const _mealTypes = ['breakfast', 'lunch', 'dinner', 'snack'];
+  final Map<String, Map<String, String?>> _plan = {};
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlan();
+  }
+
+  Future<void> _loadPlan() async {
+    final db = ref.read(databaseProvider);
+    final row = await (db.select(db.settings)
+          ..where((t) => t.key.equals(_planKey())))
+        .getSingleOrNull();
+    if (row != null) {
+      try {
+        final saved = jsonDecode(row.value) as Map<String, dynamic>;
+        setState(() {
+          for (final day in saved.keys) {
+            _plan[day] = Map<String, String?>.from((saved[day] as Map).map((k, v) => MapEntry(k.toString(), v?.toString())));
+          }
+        });
+      } catch (_) {}
+    }
+    _loaded = true;
+  }
+
+  Future<void> _savePlan() async {
+    final db = ref.read(databaseProvider);
+    await db.into(db.settings).insert(
+      SettingsCompanion(
+        key: drift.Value(_planKey()),
+        value: drift.Value(jsonEncode(_plan)),
+        updatedAt: drift.Value(DateTime.now()),
+      ),
+      mode: drift.InsertMode.insertOrReplace,
+    );
+  }
+
+  String _planKey() => 'meal_plan_${DateFormat('yyyy-MM-dd').format(_weekStart)}';
+
+  void _setMeal(String dateKey, String mealType, String? recipeId) {
+    setState(() {
+      _plan[dateKey] ??= {};
+      _plan[dateKey]![mealType] = recipeId;
+    });
+    _savePlan();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,19 +78,37 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
       appBar: AppBar(
         title: Text('Meal Plan — ${DateFormat('MMM d').format(_weekStart)}'),
         actions: [
-          IconButton(icon: const Icon(Icons.chevron_left), onPressed: () => setState(() => _weekStart = _weekStart.subtract(const Duration(days: 7)))),
-          IconButton(icon: const Icon(Icons.chevron_right), onPressed: () => setState(() => _weekStart = _weekStart.add(const Duration(days: 7)))),
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            onPressed: () async {
+              final newStart = _weekStart.subtract(const Duration(days: 7));
+              setState(() => _weekStart = newStart);
+              _plan.clear();
+              await _loadPlan();
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.chevron_right),
+            onPressed: () async {
+              final newStart = _weekStart.add(const Duration(days: 7));
+              setState(() => _weekStart = newStart);
+              _plan.clear();
+              await _loadPlan();
+            },
+          ),
         ],
       ),
-      body: recipesAsync.when(
-        data: (recipes) => ListView.builder(
-          padding: const EdgeInsets.all(8),
-          itemCount: 7,
-          itemBuilder: (_, i) => _buildDayCard(context, days[i], recipes),
-        ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-      ),
+      body: !_loaded
+          ? const Center(child: CircularProgressIndicator())
+          : recipesAsync.when(
+              data: (recipes) => ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: 7,
+                itemBuilder: (_, i) => _buildDayCard(context, days[i], recipes),
+              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Error: $e')),
+            ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -73,6 +138,7 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
     final dayPlan = _plan[dateKey] ?? {};
     final weekday = DateFormat('EEEE').format(day);
     final isWorkDay = ref.watch(workScheduleProvider).contains(weekday);
+    final isWeekend = day.weekday == DateTime.saturday || day.weekday == DateTime.sunday;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -84,20 +150,24 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
             Row(children: [
               Text(DateFormat('EEE d').format(day), style: Theme.of(context).textTheme.titleSmall),
               const Spacer(),
+              if (isWeekend)
+                const Icon(Icons.weekend, size: 16, color: Colors.purple),
               Icon(isWorkDay ? Icons.business : Icons.home, size: 16, color: isWorkDay ? Colors.blue : Colors.green),
               const SizedBox(width: 4),
-              Text(isWorkDay ? 'Office' : 'Home', style: TextStyle(fontSize: 11, color: isWorkDay ? Colors.blue : Colors.green)),
+              Text(isWeekend ? 'Weekend' : (isWorkDay ? 'Office' : 'Home'),
+                  style: TextStyle(fontSize: 11, color: isWeekend ? Colors.purple : (isWorkDay ? Colors.blue : Colors.green))),
             ]),
             const SizedBox(height: 8),
             for (final meal in _mealTypes)
-              _buildMealSlot(context, dateKey, meal, recipes, isWorkDay),
+              _buildMealSlot(context, dateKey, meal, recipes, isWorkDay, isWeekend),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMealSlot(BuildContext context, String dateKey, String mealType, List<Recipe> allRecipes, bool isWorkDay) {
+  Widget _buildMealSlot(BuildContext context, String dateKey, String mealType,
+      List<Recipe> allRecipes, bool isWorkDay, bool isWeekend) {
     final recipeId = _plan[dateKey]?[mealType];
     Recipe? selected;
     if (recipeId != null) {
@@ -110,6 +180,9 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
       if (mealType == 'lunch' && isWorkDay && !tags.contains('microwave-friendly') && !tags.contains('meal-prep')) return false;
       return true;
     }).toList();
+
+    // On weekends, show all recipes (relaxed filtering)
+    if (isWeekend) filtered = allRecipes;
 
     return InkWell(
       onTap: () => _pickRecipe(context, dateKey, mealType, filtered),
@@ -133,10 +206,9 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
           if (selected != null)
             IconButton(
               icon: const Icon(Icons.close, size: 16),
-              onPressed: () => setState(() {
-                _plan[dateKey] ??= {};
-                _plan[dateKey]![mealType] = null;
-              }),
+              onPressed: () {
+                _setMeal(dateKey, mealType, null);
+              },
             ),
         ]),
       ),
@@ -152,19 +224,19 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
             leading: const Icon(Icons.delete),
             title: const Text('Clear slot'),
             onTap: () {
-              setState(() { _plan[dateKey] ??= {}; _plan[dateKey]![mealType] = null; });
+              _setMeal(dateKey, mealType, null);
               Navigator.pop(ctx);
             },
           ),
           ...recipes.map((r) => ListTile(
-            leading: const Icon(Icons.restaurant),
-            title: Text(r.name),
-            subtitle: Text('${r.prepTimeMin ?? 0 + (r.cookTimeMin ?? 0)} min'),
-            onTap: () {
-              setState(() { _plan[dateKey] ??= {}; _plan[dateKey]![mealType] = r.id; });
-              Navigator.pop(ctx);
-            },
-          )),
+                leading: const Icon(Icons.restaurant),
+                title: Text(r.name),
+                subtitle: Text('${r.prepTimeMin ?? 0 + (r.cookTimeMin ?? 0)} min'),
+                onTap: () {
+                  _setMeal(dateKey, mealType, r.id);
+                  Navigator.pop(ctx);
+                },
+              )),
         ],
       ),
     );
@@ -173,45 +245,59 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
   Future<void> _generateWithAI() async {
     final llmService = ref.read(llmServiceProvider);
     if (llmService == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Configure API key in Settings first')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Configure API key in Settings first')),
+      );
       return;
     }
-    setState(() {});
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating meal plan with AI...'), duration: Duration(seconds: 30)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Generating 7-day meal plan...'), duration: Duration(seconds: 60)),
+    );
 
     try {
       final allRecipes = ref.read(_allRecipesForPlannerProvider).valueOrNull ?? [];
-      final recipeList = allRecipes.map((r) => '- ${r.name} (${r.id}): ${_parseTags(r.tags).join(", ")}').join('\n');
+      final recipeList = allRecipes
+          .map((r) => '- ${r.name} (${r.id}): ${_parseTags(r.tags).join(", ")}')
+          .join('\n');
 
       final response = await llmService.chat(
-        systemPrompt: 'You are a meal planner. Given a list of available recipes, assign them to days and meal slots for a week. '
-            'Consider variety: do not repeat the same recipe too often. '
-            'Return ONLY a JSON object with keys as "YYYY-MM-DD" dates and values as objects with meal types (breakfast, lunch, dinner, snack) mapping to recipe IDs.',
-        userPrompt: 'Available recipes:\n$recipeList\n\nWeek starting: ${DateFormat("yyyy-MM-dd").format(_weekStart)}. '
-            'Plan Mon-Fri (5 days). Only use the recipe IDs provided. Return JSON.',
+        systemPrompt: 'You are a meal planner. Given a list of available recipes, assign them to days and meal slots for a FULL 7-DAY WEEK (Monday through Sunday). '
+            'Consider variety: do not repeat the same recipe too often. Vary breakfasts, lunches, and dinners. '
+            'For weekends (Saturday, Sunday), you can be more relaxed (brunch-style breakfasts, more elaborate dinners). '
+            'Return ONLY a JSON object with keys as "YYYY-MM-DD" dates and values as objects with meal types (breakfast, lunch, dinner, snack) mapping to recipe IDs. '
+            'EVERY day must have at least breakfast, lunch, and dinner assigned.',
+        userPrompt: 'Available recipes:\n$recipeList\n\nWeek starting Monday: ${DateFormat("yyyy-MM-dd").format(_weekStart)}. '
+            'Plan ALL 7 days (Mon-Sun). Only use the recipe IDs provided. Return valid JSON.',
       );
 
       final json = _extractJson(response.content);
       if (json != null && mounted) {
         setState(() {
+          _plan.clear();
           for (final day in json.keys) {
-            _plan[day] = Map<String, String?>.from((json[day] as Map).map((k, v) => MapEntry(k.toString(), v?.toString())));
+            _plan[day] = Map<String, String?>.from(
+                (json[day] as Map).map((k, v) => MapEntry(k.toString(), v?.toString())));
           }
         });
+        await _savePlan();
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Meal plan generated!'), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('7-day meal plan generated!'), backgroundColor: Colors.green),
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red),
+        );
       }
     }
   }
 
-  void _generateShoppingList(List<Recipe> allRecipes) async {
+  Future<void> _generateShoppingList(List<Recipe> allRecipes) async {
     final db = ref.read(databaseProvider);
-    final Map<String, double> needed = {}; // ingredientId -> total grams
+    final Map<String, double> needed = {};
 
     for (final day in _plan.keys) {
       for (final mealId in _plan[day]!.values) {
@@ -229,7 +315,9 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
     }
 
     if (needed.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Plan some meals first!')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Plan some meals first!')),
+      );
       return;
     }
 
@@ -238,11 +326,11 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
     for (final p in pantry) {
       if (p.ingredientId != null && needed.containsKey(p.ingredientId)) {
         final current = needed[p.ingredientId!] ?? 0;
-        needed[p.ingredientId!] = (current - (p.quantityGramsEst ?? 0)).clamp(0.0, double.infinity).toDouble();
+        needed[p.ingredientId!] =
+            (current - (p.quantityGramsEst ?? 0)).clamp(0.0, double.infinity).toDouble();
       }
     }
 
-    // Create shopping list
     final allIngredients = await db.select(db.ingredients).get();
     final ingMap = {for (final i in allIngredients) i.id: i};
 
@@ -281,7 +369,9 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text('Shopping list generated!'), backgroundColor: Colors.green,
+        SnackBar(
+          content: const Text('Shopping list generated!'),
+          backgroundColor: Colors.green,
           action: SnackBarAction(label: 'View', onPressed: () => Navigator.of(context).pushNamed('/shopping-list')),
         ),
       );
@@ -294,7 +384,7 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
       final end = text.lastIndexOf('}');
       if (start >= 0 && end > start) {
         return Map<String, dynamic>.from(
-          const JsonDecoder().convert(text.substring(start, end + 1)) as Map);
+            const JsonDecoder().convert(text.substring(start, end + 1)) as Map);
       }
     } catch (_) {}
     return null;
@@ -304,7 +394,9 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
     if (json == null || json.isEmpty) return [];
     try {
       return RegExp(r'"(.*?)"').allMatches(json).map((m) => m.group(1)!).toList();
-    } catch (_) { return []; }
+    } catch (_) {
+      return [];
+    }
   }
 
   static DateTime _findMonday(DateTime d) => d.subtract(Duration(days: d.weekday - 1));
@@ -320,6 +412,5 @@ final _allRecipesForPlannerProvider = FutureProvider<List<Recipe>>((ref) async {
 });
 
 final workScheduleProvider = StateProvider<Set<String>>((ref) {
-  // Default: Monday, Tuesday, Thursday, Friday are office days
   return {'Monday', 'Tuesday', 'Thursday', 'Friday'};
 });
