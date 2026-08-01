@@ -3,6 +3,7 @@
 .packages
 build/
 *.iml
+.metadata
 .flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
@@ -24,11 +25,9 @@ web/build/
 android/app/build/
 ios/build/
 
-# Generated code
-*.g.dart
+# Note: *.g.dart files are COMMITTED (Flutter deployment does not run build_runner).
+# Only ignore transient generated files:
 *.freezed.dart
-*.drift.dart
-lib/core/database/database.g.dart
 
 # Secrets
 *.env
