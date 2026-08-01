@@ -1,8 +1,11 @@
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/database/database.dart';
 import '../../core/services/database_provider.dart';
+import '../../core/services/llm_provider.dart';
+import '../../core/services/llm_service.dart';
 import 'food_detail_screen.dart';
 
 /// Browse all ingredients with FODMAP traffic lights, nutrition, search, filters.
@@ -26,6 +29,11 @@ class _FoodDatabaseScreenState extends ConsumerState<FoodDatabaseScreen> {
       appBar: AppBar(
         title: const Text('Food Database'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.smart_toy_outlined),
+            tooltip: 'AI Lookup',
+            onPressed: () => _showAILookupDialog(context),
+          ),
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: _showFilterSheet,
@@ -156,6 +164,182 @@ class _FoodDatabaseScreenState extends ConsumerState<FoodDatabaseScreen> {
         );
       },
     );
+  }
+
+  void _showAILookupDialog(BuildContext context) {
+    final llmService = ref.read(llmServiceProvider);
+    if (llmService == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Configure your API key in Settings first')),
+      );
+      return;
+    }
+
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('AI Food Lookup'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Enter a food name to look up its nutrition and FODMAP profile.'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              decoration: const InputDecoration(
+                hintText: 'e.g. quinoa, tempeh, gochujang...',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              _enrichIngredient(llmService, controller.text);
+            },
+            child: const Text('Search'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _enrichIngredient(LLMService llmService, String foodName) async {
+    if (foodName.trim().isEmpty) return;
+
+    // Show loading
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Looking up "$foodName"...'), duration: const Duration(seconds: 10)),
+    );
+
+    try {
+      final result = await llmService.chatStructured(
+        systemPrompt: 'You are a nutritional database. Given a food name, return its full nutritional composition per 100g (energy, protein, fat, saturated fat, carbs, sugars, fiber, all minerals, all vitamins) AND its FODMAP profile.',
+        userPrompt: 'What is the full nutritional composition and FODMAP profile of "$foodName"? Return as JSON.',
+        jsonSchema: {
+          'type': 'object',
+          'required': ['name', 'category', 'nutrition', 'fodmap'],
+          'properties': {
+            'name': {'type': 'string'},
+            'category': {'type': 'string'},
+            'nutrition': {
+              'type': 'object',
+              'properties': {
+                'energy_kcal': {'type': 'number'},
+                'protein_g': {'type': 'number'},
+                'fat_total_g': {'type': 'number'},
+                'fat_saturated_g': {'type': 'number'},
+                'carbs_g': {'type': 'number'},
+                'sugars_g': {'type': 'number'},
+                'fiber_g': {'type': 'number'},
+                'calcium_mg': {'type': 'number'},
+                'iron_mg': {'type': 'number'},
+                'magnesium_mg': {'type': 'number'},
+                'phosphorus_mg': {'type': 'number'},
+                'potassium_mg': {'type': 'number'},
+                'sodium_mg': {'type': 'number'},
+                'zinc_mg': {'type': 'number'},
+                'selenium_ug': {'type': 'number'},
+                'vitamin_c_mg': {'type': 'number'},
+                'vitamin_d_ug': {'type': 'number'},
+                'vitamin_b12_ug': {'type': 'number'},
+              },
+            },
+            'fodmap': {
+              'type': 'object',
+              'properties': {
+                'level': {'type': 'string', 'enum': ['low', 'moderate', 'high']},
+                'oligos': {'type': 'integer'},
+                'fructose': {'type': 'integer'},
+                'polyols': {'type': 'integer'},
+                'lactose': {'type': 'integer'},
+                'serving_description': {'type': 'string'},
+                'serving_grams': {'type': 'number'},
+                'notes': {'type': 'string'},
+              },
+            },
+          },
+        },
+      );
+
+      final db = ref.read(databaseProvider);
+      final id = 'ai-${DateTime.now().microsecondsSinceEpoch}';
+
+      final nut = result['nutrition'] as Map<String, dynamic>;
+      final fod = result['fodmap'] as Map<String, dynamic>;
+
+      await db.into(db.ingredients).insert(
+        IngredientsCompanion(
+          id: drift.Value(id),
+          name: drift.Value(result['name'] as String? ?? foodName),
+          category: drift.Value(result['category'] as String?),
+          source: const drift.Value('llm_enriched'),
+        ),
+        mode: drift.InsertMode.insertOrIgnore,
+      );
+
+      await db.into(db.nutritionDataTable).insert(
+        NutritionDataTableCompanion(
+          ingredientId: drift.Value(id),
+          energyKcal: drift.Value((nut['energy_kcal'] as num?)?.toDouble()),
+          proteinG: drift.Value((nut['protein_g'] as num?)?.toDouble()),
+          fatTotalG: drift.Value((nut['fat_total_g'] as num?)?.toDouble()),
+          fatSaturatedG: drift.Value((nut['fat_saturated_g'] as num?)?.toDouble()),
+          carbsG: drift.Value((nut['carbs_g'] as num?)?.toDouble()),
+          sugarsG: drift.Value((nut['sugars_g'] as num?)?.toDouble()),
+          fiberG: drift.Value((nut['fiber_g'] as num?)?.toDouble()),
+          calciumMg: drift.Value((nut['calcium_mg'] as num?)?.toDouble()),
+          ironMg: drift.Value((nut['iron_mg'] as num?)?.toDouble()),
+          magnesiumMg: drift.Value((nut['magnesium_mg'] as num?)?.toDouble()),
+          phosphorusMg: drift.Value((nut['phosphorus_mg'] as num?)?.toDouble()),
+          potassiumMg: drift.Value((nut['potassium_mg'] as num?)?.toDouble()),
+          sodiumMg: drift.Value((nut['sodium_mg'] as num?)?.toDouble()),
+          zincMg: drift.Value((nut['zinc_mg'] as num?)?.toDouble()),
+          seleniumUg: drift.Value((nut['selenium_ug'] as num?)?.toDouble()),
+          vitaminCMg: drift.Value((nut['vitamin_c_mg'] as num?)?.toDouble()),
+          vitaminDUg: drift.Value((nut['vitamin_d_ug'] as num?)?.toDouble()),
+          vitaminB12Ug: drift.Value((nut['vitamin_b12_ug'] as num?)?.toDouble()),
+        ),
+        mode: drift.InsertMode.insertOrIgnore,
+      );
+
+      await db.into(db.fodmapDataTable).insert(
+        FodmapDataTableCompanion(
+          ingredientId: drift.Value(id),
+          fodmapLevel: drift.Value(fod['level'] as String? ?? 'unknown'),
+          oligos: drift.Value((fod['oligos'] as num?)?.toInt() ?? 0),
+          fructose: drift.Value((fod['fructose'] as num?)?.toInt() ?? 0),
+          polyols: drift.Value((fod['polyols'] as num?)?.toInt() ?? 0),
+          lactose: drift.Value((fod['lactose'] as num?)?.toInt() ?? 0),
+          servingDescription: drift.Value(fod['serving_description'] as String?),
+          servingGrams: drift.Value((fod['serving_grams'] as num?)?.toDouble()),
+          notes: drift.Value(fod['notes'] as String?),
+          source: const drift.Value('llm_enriched'),
+        ),
+        mode: drift.InsertMode.insertOrIgnore,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Added "$foodName" to database!'), backgroundColor: Colors.green),
+        );
+        ref.invalidate(_allIngredientsProvider);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   void _showFilterSheet() {

@@ -36,13 +36,23 @@ class _WideLayout extends StatelessWidget {
                 initialLocation: index == navigationShell.currentIndex,
               );
             },
-            leading: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Icon(
-                Icons.favorite,
-                color: Theme.of(context).colorScheme.primary,
-                size: 32,
-              ),
+            leading: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Icon(
+                    Icons.favorite,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 32,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.smart_toy_outlined),
+                  tooltip: 'AI Assistant',
+                  onPressed: () => context.go('/ai-assistant'),
+                ),
+              ],
             ),
             destinations: const [
               NavigationRailDestination(
@@ -100,6 +110,11 @@ class _NarrowLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: navigationShell,
+      floatingActionButton: FloatingActionButton.small(
+        heroTag: 'ai-assistant',
+        onPressed: () => context.go('/ai-assistant'),
+        child: const Icon(Icons.smart_toy_outlined),
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: (index) {

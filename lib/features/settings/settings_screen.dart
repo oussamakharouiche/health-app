@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'llm_settings_screen.dart';
+
 /// Settings screen: profile, nutrition targets, FODMAP phase, work schedule, LLM config.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -20,8 +22,9 @@ class SettingsScreen extends ConsumerWidget {
             _buildListTile(context, 'FODMAP phase', 'Elimination / Reintroduction / Personalization', () {}),
           ]),
           _buildSection(context, 'LLM Configuration', Icons.smart_toy, [
-            _buildListTile(context, 'Provider & API key', 'DeepSeek, OpenAI, Ollama...', () {}),
-            _buildListTile(context, 'Model', 'deepseek-chat', () {}),
+            _buildListTile(context, 'Provider & API key', 'DeepSeek, OpenAI, Ollama...', () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LLMSettingsScreen()));
+            }),
           ]),
           _buildSection(context, 'Data', Icons.storage, [
             _buildListTile(context, 'Export data', 'Backup to JSON file', () {}),
