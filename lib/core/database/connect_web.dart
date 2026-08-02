@@ -1,12 +1,8 @@
 import 'package:drift/drift.dart';
-import 'package:drift_flutter/drift_flutter.dart';
+import 'package:drift/web.dart';
 
+/// Web database using sql.js with IndexedDB storage.
+/// Persists across browser sessions (same origin).
 QueryExecutor openConnection(String name) {
-  return driftDatabase(
-    name: name,
-    web: DriftWebOptions(
-      sqlite3Wasm: Uri.parse('sqlite3.wasm'),
-      driftWorker: Uri.parse('drift_worker.js'),
-    ),
-  );
+  return WebDatabase(name);
 }
