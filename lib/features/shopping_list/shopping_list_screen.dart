@@ -106,9 +106,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                 final checked = v ?? false;
                 await (db.update(db.shoppingItems)..where((t) => t.id.equals(item.id)))
                     .write(ShoppingItemsCompanion(isChecked: drift.Value(checked)));
-                // Auto-add to pantry when checked
                 if (checked && item.ingredientId != null) {
-                  // Extract grams from amount string like "400g"
                   double? grams;
                   final amount = item.amount ?? '';
                   final match = RegExp(r'(\d+)g').firstMatch(amount);
@@ -118,7 +116,6 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                         ..where((t) => t.ingredientId.equals(item.ingredientId!)))
                       .getSingleOrNull();
                   if (existing != null) {
-                    // Update quantity
                     final newQty = (existing.quantityGramsEst ?? 0) + (grams ?? 100);
                     await (db.update(db.pantryItems)..where((t) => t.id.equals(existing.id)))
                         .write(PantryItemsCompanion(
@@ -126,13 +123,15 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                           quantityText: drift.Value('${newQty.round()}g'),
                           updatedAt: drift.Value(DateTime.now()),
                         ));
+                    // Prompt to update storage/expiry
+                    if (mounted) _quickEdit(context, existing);
                   } else {
-                    // Insert new pantry item
                     final allIngredients = await db.select(db.ingredients).get();
                     final ing = allIngredients.where((i) => i.id == item.ingredientId!).firstOrNull;
+                    final pantryId = 'pantry-${DateTime.now().microsecondsSinceEpoch}';
                     await db.into(db.pantryItems).insert(
                       PantryItemsCompanion(
-                        id: drift.Value('pantry-${DateTime.now().microsecondsSinceEpoch}'),
+                        id: drift.Value(pantryId),
                         ingredientId: drift.Value(item.ingredientId),
                         name: drift.Value(ing?.name ?? item.name),
                         quantityGramsEst: drift.Value(grams ?? 100),
@@ -144,6 +143,22 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                       ),
                       mode: drift.InsertMode.insertOrReplace,
                     );
+                    // Prompt to set storage + expiry
+                    final created = PantryItem(
+                      id: pantryId,
+                      ingredientId: item.ingredientId,
+                      name: ing?.name ?? item.name,
+                      quantityGramsEst: grams ?? 100,
+                      quantityText: '${(grams ?? 100).round()}g',
+                      category: item.category,
+                      purchasedAt: DateTime.now(),
+                      storageLocation: 'fridge',
+                      updatedAt: DateTime.now(),
+                      isStaple: false,
+                      expiryDate: null,
+                      lowStockThreshold: null,
+                    );
+                    if (mounted) _quickEdit(context, created);
                   }
                 }
                 ref.invalidate(_shoppingItemsProvider(_selectedListId!));
@@ -152,6 +167,72 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
           ],
         );
       }).toList(),
+    );
+  }
+
+  Future<void> _quickEdit(BuildContext context, PantryItem item) async {
+    DateTime? expiry = item.expiryDate;
+    String storage = item.storageLocation ?? 'fridge';
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDlgState) => AlertDialog(
+          title: Text('📦 ${item.name} added to pantry'),
+          content: SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Text('${item.quantityText ?? "${item.quantityGramsEst?.round() ?? 0}g"}', style: const TextStyle(color: Colors.grey)),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: storage,
+                decoration: const InputDecoration(labelText: 'Stored in', border: OutlineInputBorder()),
+                items: const [
+                  DropdownMenuItem(value: 'fridge', child: Text('🧊 Fridge')),
+                  DropdownMenuItem(value: 'freezer', child: Text('❄️ Freezer')),
+                  DropdownMenuItem(value: 'room_temp', child: Text('🏠 Room temp / Pantry')),
+                ],
+                onChanged: (v) => setDlgState(() => storage = v ?? 'fridge'),
+              ),
+              const SizedBox(height: 12),
+              ListTile(
+                dense: true,
+                leading: const Icon(Icons.event_busy, size: 20),
+                title: Text(expiry != null ? 'Expires: ${DateFormat('MMM d').format(expiry!)}' : 'Set expiry date (optional)'),
+                trailing: expiry != null ? IconButton(icon: const Icon(Icons.clear, size: 16), onPressed: () => setDlgState(() => expiry = null)) : null,
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: ctx,
+                    initialDate: expiry ?? DateTime.now().add(const Duration(days: 7)),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                  );
+                  if (picked != null) setDlgState(() => expiry = picked);
+                },
+              ),
+            ]),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Skip'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                final db = ref.read(databaseProvider);
+                await (db.update(db.pantryItems)..where((t) => t.id.equals(item.id)))
+                    .write(PantryItemsCompanion(
+                      storageLocation: drift.Value(storage),
+                      expiryDate: drift.Value(expiry),
+                      updatedAt: drift.Value(DateTime.now()),
+                    ));
+                ref.invalidate(_pantryProvider);
+                if (mounted) Navigator.pop(ctx);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
