@@ -15,12 +15,16 @@ See [HEALTH-APP-PLAN.md](HEALTH-APP-PLAN.md) for the full plan, data model, and 
 ## Build & Run Commands
 
 ```bash
-# Run on web (laptop browser) -- with hot reload
-flutter run -d chrome
+# Run on web with FIXED PORT (critical: browser storage is isolated per origin,
+# so random ports lose all data between sessions)
+flutter run -d chrome --web-port=8080
 # Once running, the terminal accepts these keys:
 #   r  = hot reload (injects updated code, preserves state, ~1s)
 #   R  = hot restart (full restart, resets state)
 #   q  = quit
+
+# ALSO: use Ctrl+C to quit (DON'T close the browser tab first -- let Flutter
+# shut down gracefully so WASM SQLite flushes to IndexedDB)
 
 # Run tests
 flutter test
