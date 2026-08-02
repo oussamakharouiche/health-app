@@ -10732,6 +10732,28 @@ class $PantryItemsTable extends PantryItems
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _expiryDateMeta = const VerificationMeta(
+    'expiryDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> expiryDate = GeneratedColumn<DateTime>(
+    'expiry_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _storageLocationMeta = const VerificationMeta(
+    'storageLocation',
+  );
+  @override
+  late final GeneratedColumn<String> storageLocation = GeneratedColumn<String>(
+    'storage_location',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -10755,6 +10777,8 @@ class $PantryItemsTable extends PantryItems
     lowStockThreshold,
     category,
     purchasedAt,
+    expiryDate,
+    storageLocation,
     updatedAt,
   ];
   @override
@@ -10839,6 +10863,21 @@ class $PantryItemsTable extends PantryItems
         ),
       );
     }
+    if (data.containsKey('expiry_date')) {
+      context.handle(
+        _expiryDateMeta,
+        expiryDate.isAcceptableOrUnknown(data['expiry_date']!, _expiryDateMeta),
+      );
+    }
+    if (data.containsKey('storage_location')) {
+      context.handle(
+        _storageLocationMeta,
+        storageLocation.isAcceptableOrUnknown(
+          data['storage_location']!,
+          _storageLocationMeta,
+        ),
+      );
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -10890,6 +10929,14 @@ class $PantryItemsTable extends PantryItems
         DriftSqlType.dateTime,
         data['${effectivePrefix}purchased_at'],
       ),
+      expiryDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}expiry_date'],
+      ),
+      storageLocation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}storage_location'],
+      ),
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -10913,6 +10960,8 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
   final String? lowStockThreshold;
   final String? category;
   final DateTime? purchasedAt;
+  final DateTime? expiryDate;
+  final String? storageLocation;
   final DateTime updatedAt;
   const PantryItem({
     required this.id,
@@ -10924,6 +10973,8 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
     this.lowStockThreshold,
     this.category,
     this.purchasedAt,
+    this.expiryDate,
+    this.storageLocation,
     required this.updatedAt,
   });
   @override
@@ -10949,6 +11000,12 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
     }
     if (!nullToAbsent || purchasedAt != null) {
       map['purchased_at'] = Variable<DateTime>(purchasedAt);
+    }
+    if (!nullToAbsent || expiryDate != null) {
+      map['expiry_date'] = Variable<DateTime>(expiryDate);
+    }
+    if (!nullToAbsent || storageLocation != null) {
+      map['storage_location'] = Variable<String>(storageLocation);
     }
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -10977,6 +11034,12 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
       purchasedAt: purchasedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(purchasedAt),
+      expiryDate: expiryDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(expiryDate),
+      storageLocation: storageLocation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(storageLocation),
       updatedAt: Value(updatedAt),
     );
   }
@@ -10998,6 +11061,8 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
       ),
       category: serializer.fromJson<String?>(json['category']),
       purchasedAt: serializer.fromJson<DateTime?>(json['purchasedAt']),
+      expiryDate: serializer.fromJson<DateTime?>(json['expiryDate']),
+      storageLocation: serializer.fromJson<String?>(json['storageLocation']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -11014,6 +11079,8 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
       'lowStockThreshold': serializer.toJson<String?>(lowStockThreshold),
       'category': serializer.toJson<String?>(category),
       'purchasedAt': serializer.toJson<DateTime?>(purchasedAt),
+      'expiryDate': serializer.toJson<DateTime?>(expiryDate),
+      'storageLocation': serializer.toJson<String?>(storageLocation),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -11028,6 +11095,8 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
     Value<String?> lowStockThreshold = const Value.absent(),
     Value<String?> category = const Value.absent(),
     Value<DateTime?> purchasedAt = const Value.absent(),
+    Value<DateTime?> expiryDate = const Value.absent(),
+    Value<String?> storageLocation = const Value.absent(),
     DateTime? updatedAt,
   }) => PantryItem(
     id: id ?? this.id,
@@ -11043,6 +11112,10 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
         : this.lowStockThreshold,
     category: category.present ? category.value : this.category,
     purchasedAt: purchasedAt.present ? purchasedAt.value : this.purchasedAt,
+    expiryDate: expiryDate.present ? expiryDate.value : this.expiryDate,
+    storageLocation: storageLocation.present
+        ? storageLocation.value
+        : this.storageLocation,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   PantryItem copyWithCompanion(PantryItemsCompanion data) {
@@ -11066,6 +11139,12 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
       purchasedAt: data.purchasedAt.present
           ? data.purchasedAt.value
           : this.purchasedAt,
+      expiryDate: data.expiryDate.present
+          ? data.expiryDate.value
+          : this.expiryDate,
+      storageLocation: data.storageLocation.present
+          ? data.storageLocation.value
+          : this.storageLocation,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -11082,6 +11161,8 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
           ..write('lowStockThreshold: $lowStockThreshold, ')
           ..write('category: $category, ')
           ..write('purchasedAt: $purchasedAt, ')
+          ..write('expiryDate: $expiryDate, ')
+          ..write('storageLocation: $storageLocation, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -11098,6 +11179,8 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
     lowStockThreshold,
     category,
     purchasedAt,
+    expiryDate,
+    storageLocation,
     updatedAt,
   );
   @override
@@ -11113,6 +11196,8 @@ class PantryItem extends DataClass implements Insertable<PantryItem> {
           other.lowStockThreshold == this.lowStockThreshold &&
           other.category == this.category &&
           other.purchasedAt == this.purchasedAt &&
+          other.expiryDate == this.expiryDate &&
+          other.storageLocation == this.storageLocation &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -11126,6 +11211,8 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
   final Value<String?> lowStockThreshold;
   final Value<String?> category;
   final Value<DateTime?> purchasedAt;
+  final Value<DateTime?> expiryDate;
+  final Value<String?> storageLocation;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const PantryItemsCompanion({
@@ -11138,6 +11225,8 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
     this.lowStockThreshold = const Value.absent(),
     this.category = const Value.absent(),
     this.purchasedAt = const Value.absent(),
+    this.expiryDate = const Value.absent(),
+    this.storageLocation = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -11151,6 +11240,8 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
     this.lowStockThreshold = const Value.absent(),
     this.category = const Value.absent(),
     this.purchasedAt = const Value.absent(),
+    this.expiryDate = const Value.absent(),
+    this.storageLocation = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -11165,6 +11256,8 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
     Expression<String>? lowStockThreshold,
     Expression<String>? category,
     Expression<DateTime>? purchasedAt,
+    Expression<DateTime>? expiryDate,
+    Expression<String>? storageLocation,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
@@ -11178,6 +11271,8 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
       if (lowStockThreshold != null) 'low_stock_threshold': lowStockThreshold,
       if (category != null) 'category': category,
       if (purchasedAt != null) 'purchased_at': purchasedAt,
+      if (expiryDate != null) 'expiry_date': expiryDate,
+      if (storageLocation != null) 'storage_location': storageLocation,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -11193,6 +11288,8 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
     Value<String?>? lowStockThreshold,
     Value<String?>? category,
     Value<DateTime?>? purchasedAt,
+    Value<DateTime?>? expiryDate,
+    Value<String?>? storageLocation,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
   }) {
@@ -11206,6 +11303,8 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
       lowStockThreshold: lowStockThreshold ?? this.lowStockThreshold,
       category: category ?? this.category,
       purchasedAt: purchasedAt ?? this.purchasedAt,
+      expiryDate: expiryDate ?? this.expiryDate,
+      storageLocation: storageLocation ?? this.storageLocation,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -11241,6 +11340,12 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
     if (purchasedAt.present) {
       map['purchased_at'] = Variable<DateTime>(purchasedAt.value);
     }
+    if (expiryDate.present) {
+      map['expiry_date'] = Variable<DateTime>(expiryDate.value);
+    }
+    if (storageLocation.present) {
+      map['storage_location'] = Variable<String>(storageLocation.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -11262,6 +11367,8 @@ class PantryItemsCompanion extends UpdateCompanion<PantryItem> {
           ..write('lowStockThreshold: $lowStockThreshold, ')
           ..write('category: $category, ')
           ..write('purchasedAt: $purchasedAt, ')
+          ..write('expiryDate: $expiryDate, ')
+          ..write('storageLocation: $storageLocation, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -20861,6 +20968,8 @@ typedef $$PantryItemsTableCreateCompanionBuilder =
       Value<String?> lowStockThreshold,
       Value<String?> category,
       Value<DateTime?> purchasedAt,
+      Value<DateTime?> expiryDate,
+      Value<String?> storageLocation,
       Value<DateTime> updatedAt,
       Value<int> rowid,
     });
@@ -20875,6 +20984,8 @@ typedef $$PantryItemsTableUpdateCompanionBuilder =
       Value<String?> lowStockThreshold,
       Value<String?> category,
       Value<DateTime?> purchasedAt,
+      Value<DateTime?> expiryDate,
+      Value<String?> storageLocation,
       Value<DateTime> updatedAt,
       Value<int> rowid,
     });
@@ -20949,6 +21060,16 @@ class $$PantryItemsTableFilterComposer
 
   ColumnFilters<DateTime> get purchasedAt => $composableBuilder(
     column: $table.purchasedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get expiryDate => $composableBuilder(
+    column: $table.expiryDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get storageLocation => $composableBuilder(
+    column: $table.storageLocation,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -21030,6 +21151,16 @@ class $$PantryItemsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get expiryDate => $composableBuilder(
+    column: $table.expiryDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get storageLocation => $composableBuilder(
+    column: $table.storageLocation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -21100,6 +21231,16 @@ class $$PantryItemsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<DateTime> get expiryDate => $composableBuilder(
+    column: $table.expiryDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get storageLocation => $composableBuilder(
+    column: $table.storageLocation,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
@@ -21164,6 +21305,8 @@ class $$PantryItemsTableTableManager
                 Value<String?> lowStockThreshold = const Value.absent(),
                 Value<String?> category = const Value.absent(),
                 Value<DateTime?> purchasedAt = const Value.absent(),
+                Value<DateTime?> expiryDate = const Value.absent(),
+                Value<String?> storageLocation = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PantryItemsCompanion(
@@ -21176,6 +21319,8 @@ class $$PantryItemsTableTableManager
                 lowStockThreshold: lowStockThreshold,
                 category: category,
                 purchasedAt: purchasedAt,
+                expiryDate: expiryDate,
+                storageLocation: storageLocation,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
@@ -21190,6 +21335,8 @@ class $$PantryItemsTableTableManager
                 Value<String?> lowStockThreshold = const Value.absent(),
                 Value<String?> category = const Value.absent(),
                 Value<DateTime?> purchasedAt = const Value.absent(),
+                Value<DateTime?> expiryDate = const Value.absent(),
+                Value<String?> storageLocation = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PantryItemsCompanion.insert(
@@ -21202,6 +21349,8 @@ class $$PantryItemsTableTableManager
                 lowStockThreshold: lowStockThreshold,
                 category: category,
                 purchasedAt: purchasedAt,
+                expiryDate: expiryDate,
+                storageLocation: storageLocation,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),

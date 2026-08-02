@@ -139,6 +139,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                         quantityText: drift.Value('${(grams ?? 100).round()}g'),
                         category: drift.Value(item.category),
                         purchasedAt: drift.Value(DateTime.now()),
+                        storageLocation: const drift.Value('fridge'),
                         updatedAt: drift.Value(DateTime.now()),
                       ),
                       mode: drift.InsertMode.insertOrReplace,
@@ -179,11 +180,21 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
               final daysAgo = item.purchasedAt != null
                   ? DateTime.now().difference(item.purchasedAt!).inDays
                   : null;
+              final expiryLeft = item.expiryDate != null
+                  ? item.expiryDate!.difference(DateTime.now()).inDays
+                  : null;
+              final storage = item.storageLocation ?? '';
               return ListTile(
-                title: Text(item.name),
+                title: Row(children: [
+                  Expanded(child: Text(item.name)),
+                  if (storage.isNotEmpty)
+                    Icon(_storageIcon(storage), size: 14, color: Colors.grey),
+                ]),
                 subtitle: Text([
                   item.quantityText ?? '${item.quantityGramsEst?.round() ?? 0}g',
                   if (daysAgo != null) 'bought $daysAgo days ago',
+                  if (expiryLeft != null && expiryLeft <= 3) '⚠️ expires in $expiryLeft days',
+                  if (expiryLeft != null && expiryLeft > 3) 'expires in $expiryLeft days',
                 ].join(' · ')),
                 trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                   if (item.isStaple) const Icon(Icons.star, size: 16, color: Colors.amber),
@@ -208,31 +219,62 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
     );
   }
 
+  IconData _storageIcon(String loc) {
+    switch (loc) {
+      case 'fridge': return Icons.kitchen;
+      case 'freezer': return Icons.ac_unit;
+      default: return Icons.countertops;
+    }
+  }
+
   Future<void> _addItem(BuildContext context) async {
     final nameCtrl = TextEditingController();
     final qtyCtrl = TextEditingController();
     DateTime purchaseDate = DateTime.now();
+    DateTime? expiryDate;
+    String storage = 'room_temp';
 
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDlgState) => AlertDialog(
           title: const Text('Add pantry item'),
-          content: Column(mainAxisSize: MainAxisSize.min, children: [
-            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Name', border: OutlineInputBorder())),
-            const SizedBox(height: 8),
-            TextField(controller: qtyCtrl, decoration: const InputDecoration(labelText: 'Quantity (e.g. 500g)', border: OutlineInputBorder())),
-            const SizedBox(height: 8),
-            ListTile(
-              dense: true,
-              leading: const Icon(Icons.calendar_today, size: 20),
-              title: Text('Purchased: ${DateFormat('MMM d').format(purchaseDate)}'),
-              onTap: () async {
-                final picked = await showDatePicker(context: ctx, initialDate: purchaseDate, firstDate: DateTime(2020), lastDate: DateTime.now());
-                if (picked != null) setDlgState(() => purchaseDate = picked);
-              },
-            ),
-          ]),
+          content: SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Name', border: OutlineInputBorder())),
+              const SizedBox(height: 8),
+              TextField(controller: qtyCtrl, decoration: const InputDecoration(labelText: 'Quantity (e.g. 500g)', border: OutlineInputBorder())),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: storage,
+                decoration: const InputDecoration(labelText: 'Stored in', border: OutlineInputBorder()),
+                items: const [
+                  DropdownMenuItem(value: 'fridge', child: Text('Fridge')),
+                  DropdownMenuItem(value: 'freezer', child: Text('Freezer')),
+                  DropdownMenuItem(value: 'room_temp', child: Text('Room temp / Pantry')),
+                ],
+                onChanged: (v) => setDlgState(() => storage = v ?? 'room_temp'),
+              ),
+              const SizedBox(height: 8),
+              ListTile(
+                dense: true, leading: const Icon(Icons.shopping_cart, size: 20),
+                title: Text('Purchased: ${DateFormat('MMM d').format(purchaseDate)}'),
+                onTap: () async {
+                  final picked = await showDatePicker(context: ctx, initialDate: purchaseDate, firstDate: DateTime(2020), lastDate: DateTime.now());
+                  if (picked != null) setDlgState(() => purchaseDate = picked);
+                },
+              ),
+              ListTile(
+                dense: true, leading: const Icon(Icons.event_busy, size: 20),
+                title: Text(expiryDate != null ? 'Expires: ${DateFormat('MMM d').format(expiryDate!)}' : 'Set expiry date (optional)'),
+                trailing: expiryDate != null ? IconButton(icon: const Icon(Icons.clear, size: 16), onPressed: () => setDlgState(() => expiryDate = null)) : null,
+                onTap: () async {
+                  final picked = await showDatePicker(context: ctx, initialDate: expiryDate ?? purchaseDate.add(const Duration(days: 7)), firstDate: purchaseDate, lastDate: DateTime.now().add(const Duration(days: 365)));
+                  if (picked != null) setDlgState(() => expiryDate = picked);
+                },
+              ),
+            ]),
+          ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
             FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Add')),
@@ -249,6 +291,8 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
           quantityText: drift.Value(qtyCtrl.text.trim().isEmpty ? null : qtyCtrl.text.trim()),
           isStaple: const drift.Value(false),
           purchasedAt: drift.Value(purchaseDate),
+          expiryDate: drift.Value(expiryDate),
+          storageLocation: drift.Value(storage),
           updatedAt: drift.Value(DateTime.now()),
         ),
         mode: drift.InsertMode.insertOrReplace,

@@ -303,6 +303,8 @@ class PantryItems extends Table {
   TextColumn get lowStockThreshold => text().nullable()();
   TextColumn get category => text().nullable()();
   DateTimeColumn get purchasedAt => dateTime().nullable()();
+  DateTimeColumn get expiryDate => dateTime().nullable()();
+  TextColumn get storageLocation => text().nullable()(); // fridge, freezer, room_temp
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
   @override

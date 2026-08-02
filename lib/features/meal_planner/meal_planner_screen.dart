@@ -268,8 +268,15 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
               final daysAgo = p.purchasedAt != null
                   ? DateTime.now().difference(p.purchasedAt!).inDays
                   : null;
+              final expiryIn = p.expiryDate != null
+                  ? p.expiryDate!.difference(DateTime.now()).inDays
+                  : null;
               final cat = p.category ?? '';
-              return '- ${p.name} (${cat}) — ${p.quantityText ?? "${p.quantityGramsEst?.round() ?? 0}g"}${daysAgo != null ? ", purchased $daysAgo days ago" : ""}';
+              final storage = p.storageLocation ?? 'room_temp';
+              final storageLabel = storage == 'fridge' ? '🧊 fridge' : storage == 'freezer' ? '❄️ freezer' : '🏠 room temp';
+              return '- ${p.name} (${cat})${storageLabel != "🏠 room temp" ? " [$storageLabel]" : ""} — ${p.quantityText ?? "${p.quantityGramsEst?.round() ?? 0}g"}'
+                  '${daysAgo != null ? ", purchased $daysAgo days ago" : ""}'
+                  '${expiryIn != null ? ", expires in $expiryIn days" : ""}';
             }).join('\n')
           : '(pantry is empty)';
 
@@ -277,14 +284,15 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
         systemPrompt: 'You are a meal planner and a knowledgeable chef. Given a list of available recipes, assign them to days and meal slots for a FULL 7-DAY WEEK (Monday through Sunday). '
             'Consider variety: do not repeat the same recipe too often. '
             'For weekends (Saturday, Sunday), you can be more relaxed (brunch-style breakfasts, more elaborate dinners). '
-            'You also receive a pantry inventory with each ingredient\'s category and purchase date. Use your food safety knowledge to prioritize recipes that consume perishable items before they spoil. '
-            'For example: fresh meat, fish, dairy, leafy greens, berries, and soft vegetables should be used within days of purchase. Dry goods (rice, pasta, oats), canned items, frozen foods, oils, nuts, and hard cheeses last much longer and can be deferred to later in the week. '
+            'You also receive a pantry inventory with each ingredient\'s category, storage location (fridge/freezer/room temp), purchase date, and expiry date if known. Use your food safety knowledge to prioritize recipes that consume perishable items before they spoil. '
+            'CRITICAL GUIDELINES: Fridge items (raw meat, fish, dairy, leafy greens, berries, soft veg) should be used within days of purchase, especially if no expiry date is given. Freezer items last months. Room temp dry goods (rice, pasta, oats, canned, oils, nuts) last weeks to months. '
+            'If an expiry date is listed and it\'s within the current week, that ingredient MUST be used before that date. '
             'Balance this waste-minimization with nutritional goals: ensure the week covers adequate protein, fiber, and micronutrients. The user follows a LOW FODMAP diet — avoid stacking high-FODMAP ingredients in the same meal. '
             'Return ONLY a JSON object with keys as "YYYY-MM-DD" dates and values as objects with meal types (breakfast, lunch, dinner, snack) mapping to recipe IDs. '
             'EVERY day must have at least breakfast, lunch, and dinner assigned.',
-        userPrompt: 'Available recipes:\n$recipeList\n\nPantry inventory (use perishable items first):\n$pantryList\n\n'
+        userPrompt: 'Available recipes:\n$recipeList\n\nPantry inventory (use perishable items first, respect expiry dates):\n$pantryList\n\n'
             'Week starting Monday: ${DateFormat("yyyy-MM-dd").format(_weekStart)}. '
-            'Plan ALL 7 days (Mon-Sun). Only use the recipe IDs provided. Prioritize perishable ingredients based on their category and how long ago they were purchased. Return valid JSON.',
+            'Plan ALL 7 days (Mon-Sun). Only use the recipe IDs provided. Prioritize fridge items and ingredients expiring this week. Return valid JSON.',
       );
 
       final json = _extractJson(response.content);
