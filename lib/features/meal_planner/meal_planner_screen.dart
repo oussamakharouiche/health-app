@@ -268,21 +268,23 @@ class _MealPlannerScreenState extends ConsumerState<MealPlannerScreen> {
               final daysAgo = p.purchasedAt != null
                   ? DateTime.now().difference(p.purchasedAt!).inDays
                   : null;
-              return '- ${p.name} (${p.quantityText ?? "${p.quantityGramsEst?.round() ?? 0}g"})${daysAgo != null ? " — bought $daysAgo days ago" : ""}${daysAgo != null && daysAgo > 5 ? " ⚠️ USE SOON" : ""}';
+              final cat = p.category ?? '';
+              return '- ${p.name} (${cat}) — ${p.quantityText ?? "${p.quantityGramsEst?.round() ?? 0}g"}${daysAgo != null ? ", purchased $daysAgo days ago" : ""}';
             }).join('\n')
           : '(pantry is empty)';
 
       final response = await llmService.chat(
-        systemPrompt: 'You are a meal planner. Given a list of available recipes, assign them to days and meal slots for a FULL 7-DAY WEEK (Monday through Sunday). '
-            'Consider variety: do not repeat the same recipe too often. Vary breakfasts, lunches, and dinners. '
+        systemPrompt: 'You are a meal planner and a knowledgeable chef. Given a list of available recipes, assign them to days and meal slots for a FULL 7-DAY WEEK (Monday through Sunday). '
+            'Consider variety: do not repeat the same recipe too often. '
             'For weekends (Saturday, Sunday), you can be more relaxed (brunch-style breakfasts, more elaborate dinners). '
-            'CRITICAL: You also have a pantry with ingredients listed below. Prioritize recipes that use ingredients marked "⚠️ USE SOON" or bought more than 5 days ago. '
-            'This minimizes food waste. However, still ensure the overall plan meets nutritional balance and the user is on a LOW FODMAP diet. '
+            'You also receive a pantry inventory with each ingredient\'s category and purchase date. Use your food safety knowledge to prioritize recipes that consume perishable items before they spoil. '
+            'For example: fresh meat, fish, dairy, leafy greens, berries, and soft vegetables should be used within days of purchase. Dry goods (rice, pasta, oats), canned items, frozen foods, oils, nuts, and hard cheeses last much longer and can be deferred to later in the week. '
+            'Balance this waste-minimization with nutritional goals: ensure the week covers adequate protein, fiber, and micronutrients. The user follows a LOW FODMAP diet — avoid stacking high-FODMAP ingredients in the same meal. '
             'Return ONLY a JSON object with keys as "YYYY-MM-DD" dates and values as objects with meal types (breakfast, lunch, dinner, snack) mapping to recipe IDs. '
             'EVERY day must have at least breakfast, lunch, and dinner assigned.',
-        userPrompt: 'Available recipes:\n$recipeList\n\nPantry ingredients (prioritize soon-to-expire items):\n$pantryList\n\n'
+        userPrompt: 'Available recipes:\n$recipeList\n\nPantry inventory (use perishable items first):\n$pantryList\n\n'
             'Week starting Monday: ${DateFormat("yyyy-MM-dd").format(_weekStart)}. '
-            'Plan ALL 7 days (Mon-Sun). Only use the recipe IDs provided. Prioritize recipes that use pantry items marked ⚠️ USE SOON. Return valid JSON.',
+            'Plan ALL 7 days (Mon-Sun). Only use the recipe IDs provided. Prioritize perishable ingredients based on their category and how long ago they were purchased. Return valid JSON.',
       );
 
       final json = _extractJson(response.content);
