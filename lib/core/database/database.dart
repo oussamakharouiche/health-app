@@ -41,8 +41,13 @@ class AppDatabase extends _$AppDatabase {
           await m.createAll();
         },
         onUpgrade: (m, from, to) async {
+          // Add columns introduced in v3 and v4 without dropping data.
+          if (from < 3) {
+            await m.addColumn(pantryItems, pantryItems.purchasedAt);
+          }
           if (from < 4) {
-            await m.createAll();
+            await m.addColumn(pantryItems, pantryItems.expiryDate);
+            await m.addColumn(pantryItems, pantryItems.storageLocation);
           }
         },
       );
